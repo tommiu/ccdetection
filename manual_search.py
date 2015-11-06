@@ -23,6 +23,7 @@ class ManualCCSearch(object):
     # Gremlin operations
     ORDER_LN = ".order{it.a.lineno <=> it.b.lineno}" # Order by linenumber
     
+    QUERIES_DIR = "/shared_data/workspace/ccdetection/gremlin_queries/"
     
     def __init__(self):
         '''
@@ -71,63 +72,30 @@ class ManualCCSearch(object):
         return query
     
     def sqlNewIndirect(self):
-        query = self.UNTRUSTED_DATA + self.SQL_QUERY_FUNCS + """
-                
-        def warning( id, type, filename, lineno) {
-          "findsqlinjnew_indirect: In file " + filename + ": line " + lineno + " potentially dangerous (node id " + id + ", type " + type + ")"
-        }
+        query = self.UNTRUSTED_DATA + self.SQL_QUERY_FUNCS
         
-        def unexpected( id, type, filename, lineno) {
-          "findsqlinjnew_indirect: Unexpected first argument to SQL query call in " + filename + ", line " + lineno + " (node id " + id + ", type " + type + ")"
-        }
-        
-                
-        g.V()
-        
-        // find all call expressions where the called function is called "mysql_query" / "pg_query" / "sqlite_query"
-        .filter{ sql_query_funcs.contains(it.code) && isCallExpression(it.nameToCall().next()) }.callexpressions()
-        
-        // traverse to arguments; note that we do not know whether to traverse
-        // to the first or second argument, so just collect them all (1)
-        .callToArguments()
-        
-        // match variables (argument could be a variable itself, or contain
-        // variables within a string concatenation or an encapsulated list)
-        .match{ it.type == TYPE_VAR }
-        
-        // label here for looping
-        .as('x')
-        
-        // save the variable node
-        .sideEffect{ var = it }
-        
-        // traverse to enclosing function or file statements node
-        .fileOrFunctionStmts()
-        
-        // match assignments whose left side is the saved variable name...
-        .match{ isAssignment(it) && it.lval().varToName().next() == var.varToName().next() }
-        
-        // ...find the variables that occur on the right-hand side...
-        .rval().match{ it.type == TYPE_VAR }
-        
-        // loop until nothing new is emitted, and emit all objects in each iteration
-        .loop('x'){ it.object != null }{ true }
-        
-        // filter only the nodes contained in the attacker sources
-        .filter{ attacker_sources.contains(it.varToName().next()) }
-        
-        // finally, when we get here, go back to the matched variable and emit a warning
-        .back('x')
-        .transform{ warning(it.id, it.type, it.toFile().fileToPath().next(), it.lineno) }
-        """
+        query += open(self.QUERIES_DIR + "sql_new_indirect.query", 'r').read()
     
         return query
     
-    def runTimedQuery(self, myFunction):
+    def runQuery(self, query):
+        return query
+    
+    def runTimedQuery(self, myFunction, query=None):
         start = time.time()
-        res = self.j.runGremlinQuery(myFunction())
+        res = None
+        
+        if query:
+            res = self.j.runGremlinQuery(myFunction(query))
+        else:
+            res = self.j.runGremlinQuery(myFunction())
         elapsed = time.time() - start
         
-        print "Query done in %f seconds." % (elapsed)
-        for node in res:
-            print node
+#         print "Query done in %f seconds." % (elapsed)
+        try:
+            for node in res:
+                print node
+        
+        except TypeError:
+            # res is not iterable, because it is one node only.
+            print res
