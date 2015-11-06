@@ -25,15 +25,15 @@ class ManualCCSearch(object):
     
     QUERIES_DIR = "/shared_data/workspace/ccdetection/gremlin_queries/"
     
-    def __init__(self):
+    def __init__(self, port):
         '''
         Constructor
         '''
         self.j = JoernSteps()
-        self.j.setGraphDbURL('http://localhost:7474/db/data/')
+        self.j.setGraphDbURL('http://localhost:%d/db/data/' % (port))
         self.j.addStepsDir("/opt/python-joern/joern/phpjoernsteps")
         self.j.connectToDatabase()
-    
+        
     def searchCCOne(self):
         """
         Search for the first vulnerable tutorial (SQL injection from stackoverflow):
@@ -91,7 +91,7 @@ class ManualCCSearch(object):
             res = self.j.runGremlinQuery(myFunction())
         elapsed = time.time() - start
         
-#         print "Query done in %f seconds." % (elapsed)
+        print "Query done in %f seconds." % (elapsed)
         try:
             for node in res:
                 print node

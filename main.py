@@ -13,6 +13,8 @@ import pexpect
 import os
 import signal
 import subprocess
+import multiprocessing
+import itertools
 
 
 ARGS_HELP    = "help"
@@ -42,25 +44,25 @@ def main(argv):
     
     elif flow[parser.KEY_MODE] == ARGS_SEARCH:
         flow["in"] = os.path.abspath(flow["in"])
-        code_path  = ""
         code = ""
+        code_path = ""
+        multithreads = 0
+        process_number = 1
         
         try:
-            code_path = flow["c"]
+            multithreads = int(getArg(flow, "m", "multithreading"))
         except:
-            code_path = flow["code"]
+            pass
+        
+        code_path = getArg(flow, "c", "code")
         
         # Read given code.
         with open(code_path, "r") as fh:
             code = fh.read()
         
-        if "l" in flow or "level" in flow:
-            level = 0
-            if "l" in flow:
-                level = int(flow["l"])
-            else:
-                level = int(flow["level"])
-                
+        try:
+            level = int(getArg(flow, "l", "level"))
+        
             try:
                 path_generator = getRootDirectories(flow["in"], level)
                 
@@ -72,20 +74,41 @@ def main(argv):
 #                 print "Found %d projects. Going to analyse them now." % (
 #                                                                     len(paths)
 #                                                                     )
-            for path in path_generator:
-                analyseData(code, path)
-                
-            else:
-                print "There is no top-level directory %d levels below '%s'" %(
-                                    level, flow["in"]
+            projects_analysed = 0
+            
+            if multithreads > 1:
+                process_number_generator = generateProcessNumber()
+                p = multiprocessing.Pool(multithreads)
+                p.map(analyseData, itertools.izip(itertools.repeat(code), path_generator, process_number_generator))
+
+            else:    
+                for path in path_generator:
+                    projects_analysed += 1
+                    analyseData(code, path)
+            
+            if projects_analysed == 0:
+                print "There is no top-level directory %d %s below '%s'" %(
+                                    level, 
+                                    "level" if level == 1 else "levels",
+                                    flow["in"]
                                     )
-        else:
-            analyseData(code, flow["in"])
+            
+        except ArgException:
+            # Parameter "-l/--level" was not specified.
+            analyseData((code, flow["in"], 1))
 
     else:
         parser.printHelp(argv[0])
         sys.exit()
-    
+
+def generateProcessNumber():
+    i = 1
+    while True:
+        yield i
+        i += 1
+        if i > 4:
+            i = 1
+   
 def getRootDirectories(path, level):    
     """
     Get all paths of the root directories.
@@ -134,37 +157,44 @@ def traversePath(destination_list, path, current_level, target_level):
                         current_level + 1, target_level
                         )
 
-def analyseData(code, path):
+def analyseData(code_and_path_process_number):
+# def analyseData(code, path, process_number=1):
     """
     Create the PHP AST of the files in 'path', import them into the 
     neo4j graph database and start the neo4j console.
     Finally, run the analysing query against the graph database. 
     """
+    code, path, process_number = code_and_path_process_number
+    print path, process_number
+    
     try:
-        process = prepareData(path)
-            
-        cc_tester = ManualCCSearch()
+        process = prepareData(path, process_number)
+        
+        cc_tester = ManualCCSearch(7473 + process_number)
         cc_tester.runTimedQuery(cc_tester.runQuery, query=code)
-        
+
         process.sendcontrol('c')
-        process.close()    
-        
+        process.close()
+
     except BindException as err:
         print err
         print "Trying 'pkill -f java -cp.+neo4j' and restart"
-        process = pexpect.run("pkill -f \"java -cp.+neo4j\"")
-        analyseData(code, path)
+        process = pexpect.run("pkill -f \"java -cp /opt/neo4j-0%d\"" % (
+                                                                process_number
+                                                                ))
+#         analyseData(code, path)
+        analyseData(code_and_path_process_number)
 
-def prepareData(path):
+def prepareData(path, process_number=1):
     print "Analysing path: %s" % path
-#     process = pexpect.spawn("/bin/bash", ["/opt/phpjoern/spawn_neodb.sh", path], 15)
-    process = pexpect.spawn(SPAWN_SCRIPT, [path,], 360)
+    process = pexpect.spawn(SPAWN_SCRIPT, [path, str(process_number)], 360)
+    
     expectation = process.expect([
                         "graph.db still exists", 
                         "Remote interface ready", 
-                        "java.net.BindException"
+                        "java.net.BindException",
                         ])
-    
+
     if expectation == 2:
 #         print process.before
         raise BindException()
@@ -214,7 +244,8 @@ def setupArgs(parser):
                             ["in=", None]
                             ],
                                 [
-                            ["l=", "level"]
+                            ["l=", "level"],
+                            ["m=", "multithreading"]
                             ],
                                 explanation=explanation
                                 )
@@ -230,6 +261,23 @@ def setupArgs(parser):
                                 explanation=explanation
                                 )
 
+def getArg(_list, key1, key2=None):
+    result = ""
+    try:
+        result = _list[key1]
+    except:
+        if key2:
+            try:
+                result = _list[key2]
+            
+            except:
+                raise ArgException()
+        
+        else:
+            raise ArgException()
+        
+    return result
+
 class BindException(BaseException):
     def __init__(self, msg=None):
         if msg:
@@ -239,6 +287,19 @@ class BindException(BaseException):
             self.message = (
                     "java.net.BindException: Address already in use. "
                     "-> pkill neo4j."
+                    )
+            
+    def __str__(self):
+        return self.message
+
+class ArgException(BaseException):
+    def __init__(self, msg=None):
+        if msg:
+            self.message = msg
+            
+        else:
+            self.message = (
+                    "Parameter was not specified."
                     )
             
     def __str__(self):
