@@ -4,6 +4,7 @@ Created on Sep 28, 2015
 @author: Tommi Unruh
 '''
 
+
 import sys
 from joern.all import JoernSteps
 from time import sleep
@@ -16,6 +17,9 @@ import subprocess
 import multiprocessing
 import itertools
 
+import numap
+from LazyMP import LazyMP
+from LazyMP import ProcessIdGenerator
 
 ARGS_HELP    = "help"
 ARGS_SEARCH  = "search"
@@ -43,65 +47,102 @@ def main(argv):
         startConsoleMode(os.path.abspath(flow["in"]))
     
     elif flow[parser.KEY_MODE] == ARGS_SEARCH:
-        flow["in"] = os.path.abspath(flow["in"])
-        code = ""
-        code_path = ""
-        multithreads = 0
-        process_number = 1
-        
-        try:
-            multithreads = int(getArg(flow, "m", "multithreading"))
-        except:
-            pass
-        
-        code_path = getArg(flow, "c", "code")
-        
-        # Read given code.
-        with open(code_path, "r") as fh:
-            code = fh.read()
-        
-        try:
-            level = int(getArg(flow, "l", "level"))
-        
-            try:
-                path_generator = getRootDirectories(flow["in"], level)
-                
-            except Exception as err:
-                print "An exception occured: %s" % err
-                sys.exit()
-                
-#             if paths:
-#                 print "Found %d projects. Going to analyse them now." % (
-#                                                                     len(paths)
-#                                                                     )
-            projects_analysed = 0
-            
-            if multithreads > 1:
-                process_number_generator = generateProcessNumber()
-                p = multiprocessing.Pool(multithreads)
-                p.map(analyseData, itertools.izip(itertools.repeat(code), path_generator, process_number_generator))
-
-            else:    
-                for path in path_generator:
-                    projects_analysed += 1
-                    analyseData(code, path)
-            
-            if projects_analysed == 0:
-                print "There is no top-level directory %d %s below '%s'" %(
-                                    level, 
-                                    "level" if level == 1 else "levels",
-                                    flow["in"]
-                                    )
-            
-        except ArgException:
-            # Parameter "-l/--level" was not specified.
-            analyseData((code, flow["in"], 1))
+        startSearchMode(flow)
 
     else:
         parser.printHelp(argv[0])
         sys.exit()
 
+def startSearchMode(flow):
+    flow["in"] = os.path.abspath(flow["in"])
+    code = ""
+    level = 0
+    code_path = ""
+    multithreads = 0
+    process_number = 1
+    
+    try:
+        multithreads = int(getArg(flow, "m", "multithreading"))
+    except:
+        pass
+    
+    code_path = getArg(flow, "c", "code")
+    
+    # Read given code.
+    with open(code_path, "r") as fh:
+        code = fh.read()
+    
+    try:
+        level = int(getArg(flow, "l", "level"))
+        
+    except ArgException:
+        # Parameter "-l/--level" was not specified.
+        pass
+    
+    if level == 0:
+        # Analyse specified file/files in specified directory.
+        analyseData((
+                code, flow["in"], 1
+                ))
+    
+    else:
+        # Analyse folders 'level' levels under specified path.
+        try:
+            # Get the root directory of every project in a generator.
+            path_generator = getRootDirectories(flow["in"], level)
+            
+        except Exception as err:
+            print "An exception occured: %s" % err
+            sys.exit()
+
+    projects_analysed = 0
+    
+    if multithreads > 1:
+        # Multithreading was specified.
+        
+        # FIX GENERATOR NUMBER
+#         process_number_generator = generateProcessNumber()
+        process_number_generator = ProcessIdGenerator()
+        
+        # Start a lazy pool of processes.
+        pool = LazyMP().poolImapUnordered(
+                analyseData, itertools.izip(
+                        itertools.repeat(code), path_generator, 
+                        process_number_generator.getGenerator([1,2,3,4]),
+                        ),
+                multithreads,
+                process_number_generator
+                )
+
+        # And let them work.
+        try:
+            while True:
+                # Let multiprocessing pool process all arguments.
+                pool.next()
+                projects_analysed += 1
+                
+        except Exception as err:
+            # Done
+            print err
+            pass
+
+    else:    
+        # No multithreading.
+        for path in path_generator:
+            analyseData((
+                    code, path, 1
+                    ))
+            projects_analysed += 1
+    
+    if projects_analysed == 0:
+        print "There is no top-level directory %d %s below '%s'" %(
+                            level, 
+                            "level" if level == 1 else "levels",
+                            flow["in"]
+                            )
+
 def generateProcessNumber():
+    waiting_process = []
     i = 1
     while True:
         yield i
@@ -157,15 +198,13 @@ def traversePath(destination_list, path, current_level, target_level):
                         current_level + 1, target_level
                         )
 
-def analyseData(code_and_path_process_number):
-# def analyseData(code, path, process_number=1):
+def analyseData(code_and_path_and_process_number):
     """
     Create the PHP AST of the files in 'path', import them into the 
     neo4j graph database and start the neo4j console.
     Finally, run the analysing query against the graph database. 
     """
-    code, path, process_number = code_and_path_process_number
-    print path, process_number
+    code, path, process_number = code_and_path_and_process_number
     
     try:
         process = prepareData(path, process_number)
@@ -182,8 +221,9 @@ def analyseData(code_and_path_process_number):
         process = pexpect.run("pkill -f \"java -cp /opt/neo4j-0%d\"" % (
                                                                 process_number
                                                                 ))
-#         analyseData(code, path)
-        analyseData(code_and_path_process_number)
+        analyseData(code_and_path_and_process_number)
+        
+    return process_number
 
 def prepareData(path, process_number=1):
     print "Analysing path: %s" % path

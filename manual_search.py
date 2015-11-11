@@ -30,7 +30,7 @@ class ManualCCSearch(object):
         Constructor
         '''
         self.j = JoernSteps()
-        self.j.setGraphDbURL('http://localhost:%d/db/data/' % (port))
+        self.j.setGraphDbURL('http://localhost:%d/db/data/' % (int(port)))
         self.j.addStepsDir("/opt/python-joern/joern/phpjoernsteps")
         self.j.connectToDatabase()
         
@@ -95,7 +95,7 @@ class ManualCCSearch(object):
         try:
             for node in res:
                 print node
-        
+
         except TypeError:
             # res is not iterable, because it is one node only.
             print res
