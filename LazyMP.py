@@ -113,12 +113,9 @@ class ProcessIdGenerator(object):
             try:
                 next = int(self.waiting_ids.get())
                 yield next
-#             except IndexError:
-#                 print "IndexError in generator:", self.waiting_ids
-#                 raise Queue.Full
-            except Exception as err:
-                print "EXCEPTION:", err
+            
+            except:
+                pass
     
     def addToGenerator(self, _id):
         self.waiting_ids.put(int(_id))
-        print "Added to generator:", self.waiting_ids
