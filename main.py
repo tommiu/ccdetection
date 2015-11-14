@@ -6,26 +6,18 @@ Created on Sep 28, 2015
 
 
 import sys
-from joern.all import JoernSteps
-from time import sleep
-from manual_search import ManualCCSearch
 from args_parser import ModeArgsParser
-import pexpect
 import os
-import signal
-import subprocess
-import multiprocessing
 import itertools
 
-import numap
 from LazyMP import LazyMP
 from LazyMP import ProcessIdGenerator
+from neo4j_helper import Neo4jHelper
 
 ARGS_HELP    = "help"
 ARGS_SEARCH  = "search"
+ARGS_CONFIG  = "config"
 ARGS_CONSOLE = "console"
-
-SPAWN_SCRIPT = "/opt/phpjoern/spawn_neodb.sh"
 
 def main(argv):
     # Setup command line arguments.
@@ -44,10 +36,13 @@ def main(argv):
         sys.exit()
     
     elif flow[parser.KEY_MODE] == ARGS_CONSOLE:
-        startConsoleMode(os.path.abspath(flow["in"]))
+        Neo4jHelper().startConsole(os.path.abspath(flow["in"]))
     
     elif flow[parser.KEY_MODE] == ARGS_SEARCH:
         startSearchMode(flow)
+        
+    elif flow[parser.KEY_MODE] == ARGS_CONFIG:
+        pass
 
     else:
         parser.printHelp(argv[0])
@@ -57,9 +52,8 @@ def startSearchMode(flow):
     flow["in"] = os.path.abspath(flow["in"])
     code = ""
     level = 0
-    code_path = ""
     multithreads = 0
-    process_number = 1
+    neo4j_helper = Neo4jHelper()
     
     try:
         multithreads = int(getArg(flow, "m", "multithreading"))
@@ -81,7 +75,7 @@ def startSearchMode(flow):
     
     if level == 0:
         # Analyse specified file/files in specified directory.
-        analyseData((
+        neo4j_helper.analyseData((
                 code, flow["in"], 1
                 ))
     
@@ -100,13 +94,11 @@ def startSearchMode(flow):
     if multithreads > 1:
         # Multithreading was specified.
         
-        # FIX GENERATOR NUMBER
-#         process_number_generator = generateProcessNumber()
         process_number_generator = ProcessIdGenerator()
         
         # Start a lazy pool of processes.
         pool = LazyMP().poolImapUnordered(
-                analyseData, itertools.izip(
+                analyseDataHelper, itertools.izip(
                         itertools.repeat(code), path_generator, 
                         process_number_generator.getGenerator([1,2,3,4]),
                         ),
@@ -129,27 +121,19 @@ def startSearchMode(flow):
     else:    
         # No multithreading.
         for path in path_generator:
-            analyseData((
+            neo4j_helper.analyseData((
                     code, path, 1
                     ))
             projects_analysed += 1
     
     if projects_analysed == 0:
-        print "There is no top-level directory %d %s below '%s'" %(
-                            level, 
-                            "level" if level == 1 else "levels",
+        print "No project analysed for path: '%s'" %(
                             flow["in"]
                             )
 
-def generateProcessNumber():
-    waiting_process = []
-    i = 1
-    while True:
-        yield i
-        i += 1
-        if i > 4:
-            i = 1
-   
+def analyseDataHelper(args):
+    Neo4jHelper.analyseData(args)
+
 def getRootDirectories(path, level):    
     """
     Get all paths of the root directories.
@@ -198,67 +182,6 @@ def traversePath(destination_list, path, current_level, target_level):
                         current_level + 1, target_level
                         )
 
-def analyseData(code_and_path_and_process_number):
-    """
-    Create the PHP AST of the files in 'path', import them into the 
-    neo4j graph database and start the neo4j console.
-    Finally, run the analysing query against the graph database. 
-    """
-    code, path, process_number = code_and_path_and_process_number
-    
-    try:
-        process = prepareData(path, process_number)
-        
-        cc_tester = ManualCCSearch(7473 + process_number)
-        cc_tester.runTimedQuery(cc_tester.runQuery, query=code)
-
-        process.sendcontrol('c')
-        process.close()
-
-    except BindException as err:
-        print err
-        print "Trying 'pkill -f java -cp.+neo4j' and restart"
-        process = pexpect.run("pkill -f \"java -cp /opt/neo4j-0%d\"" % (
-                                                                process_number
-                                                                ))
-        analyseData(code_and_path_and_process_number)
-        
-    return process_number
-
-def prepareData(path, process_number=1):
-    print "Analysing path: %s" % path
-    process = pexpect.spawn(SPAWN_SCRIPT, [path, str(process_number)], 360)
-    
-    expectation = process.expect([
-                        "graph.db still exists", 
-                        "Remote interface ready", 
-                        "java.net.BindException",
-                        ])
-
-    if expectation == 2:
-#         print process.before
-        raise BindException()
-    
-    return process
-
-def startConsoleMode(path):
-    """
-    Import the php file/project AST from 'path' into the neo4j 
-    database and start the neo4j console, using the 'SPAWN_SCRIPT' file.
-    """
-#     print "Using path %s" % path
-    process = subprocess.call(
-                        [SPAWN_SCRIPT, path],
-#                         shell=True,
-                        preexec_fn=os.setsid
-                        )
-    
-    def signalHandler(signalnum, handler):
-        os.killpg(process.pid, signal.SIGINT)
-        
-    signal.signal(signal.SIGINT, signalHandler)
-    signal.signal(signal.SIGTERM, signalHandler)
-            
 def setupArgs(parser):
     """
     Setup command line arguments combinations.
@@ -292,6 +215,18 @@ def setupArgs(parser):
     
     # Open neo4j console: console -in dir/file
     explanation = (
+                "Setup the config file using the specified path in '-p/--path'."
+                " The config file contains all the necessary paths for "
+                "ccdetection to work correctly."
+                )
+    parser.addArgumentsCombination(
+                                ARGS_CONFIG,
+                                [["p=", "path"]],
+                                explanation=explanation
+                                )
+    
+    # Open neo4j console: console -in dir/file
+    explanation = (
                 "Import the php file/project AST into the neo4j database and "
                 "start the neo4j console."
                 )
@@ -317,20 +252,6 @@ def getArg(_list, key1, key2=None):
             raise ArgException()
         
     return result
-
-class BindException(BaseException):
-    def __init__(self, msg=None):
-        if msg:
-            self.message = msg
-            
-        else:
-            self.message = (
-                    "java.net.BindException: Address already in use. "
-                    "-> pkill neo4j."
-                    )
-            
-    def __str__(self):
-        return self.message
 
 class ArgException(BaseException):
     def __init__(self, msg=None):
