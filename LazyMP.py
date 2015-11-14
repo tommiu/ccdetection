@@ -1,9 +1,11 @@
 '''
 Created on Nov 10, 2015
 
-Taken/derived from 
+Taken from 
 http://www.grantjenks.com/wiki/random/python_multiprocessing_lazy_iterating_map
 (2013/12/03 11:14 by grant)
+
+and extended by me.
 
 @author: Tommi Unruh
 '''
@@ -105,14 +107,14 @@ class ProcessIdGenerator(object):
     
     def getGenerator(self, ids):
         self.waiting_ids = mp.Queue(4)
-        for id in ids:
-            self.waiting_ids.put(int(id))
+        for _id in ids:
+            self.waiting_ids.put(int(_id))
             
         while True:
             # Raises IndexError on empty list.
             try:
-                next = int(self.waiting_ids.get())
-                yield next
+                _next = int(self.waiting_ids.get())
+                yield _next
             
             except:
                 pass

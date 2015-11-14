@@ -9,13 +9,12 @@ import subprocess
 import os
 import signal
 import sys
+from configurator import Configurator
 
 class Neo4jHelper(object):
     """
     Handling of everything concerning neo4j.
     """
-    
-    SPAWN_SCRIPT = "/opt/phpjoern/spawn_neodb.sh"
 
     def __init__(self):
         '''
@@ -31,21 +30,22 @@ class Neo4jHelper(object):
         """
         code, path, process_number = code_and_path_and_process_number
         
+        port = 7473 + process_number
         try:
             process = Neo4jHelper.prepareData(path, process_number)
-            
-            cc_tester = ManualCCSearch(7473 + process_number)
+            cc_tester = ManualCCSearch(port)
             cc_tester.runTimedQuery(cc_tester.runQuery, query=code)
     
             process.sendcontrol('c')
             process.close()
     
         except BindException as err:
-            print err
-            print "Trying 'pkill -f java -cp.+neo4j' and restart"
-            process = pexpect.run("pkill -f \"java -cp /opt/neo4j-0%d\"" % (
-                                                                    process_number
-                                                                    ))
+            print (
+                "Port %d is taken. Trying to kill a neo4j graph database "
+                "listening on that port and start an updated one."
+                )
+            
+            Neo4jHelper.killProcess(process_number)
             Neo4jHelper.analyseData(code_and_path_and_process_number)
         
         print "process number:", process_number
@@ -54,7 +54,10 @@ class Neo4jHelper(object):
     @staticmethod
     def prepareData(path, process_number=1):
         print "Analysing path: %s" % path
-        process = pexpect.spawn(Neo4jHelper.SPAWN_SCRIPT, [path, str(process_number)], 360)
+        process = pexpect.spawn(
+                            Configurator.getPath(Configurator.SPAWN_SCRIPT),
+                            [path, str(process_number)], 360
+                            )
         
         expectation = process.expect([
                             "graph.db still exists", 
@@ -75,8 +78,10 @@ class Neo4jHelper(object):
         """
     #     print "Using path %s" % path
         process = subprocess.call(
-                            [Neo4jHelper.SPAWN_SCRIPT, path, "1"],
-    #                         shell=True,
+                            [
+                        Configurator.getPath(Configurator.SPAWN_SCRIPT),
+                        path, "1"
+                        ],
                             preexec_fn=os.setsid
                             )
         
@@ -86,6 +91,14 @@ class Neo4jHelper(object):
         signal.signal(signal.SIGINT, signalHandler)
         signal.signal(signal.SIGTERM, signalHandler)
         
+    @staticmethod
+    def killProcess(process_number):
+        kill_regex = "\"java -cp .*neo4j-0%d.*\"" % process_number
+        process = pexpect.spawn("pkill -f %s" % (kill_regex))
+        
+        # Wait until child finishes.
+        process.expect(pexpect.EOF)
+    
 class BindException(BaseException):
     def __init__(self, msg=None):
         if msg:

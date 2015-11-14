@@ -6,6 +6,7 @@ Created on Oct 27, 2015
 
 from joern.all import JoernSteps
 import time
+from configurator import Configurator
 
 class ManualCCSearch(object):
     '''
@@ -23,8 +24,6 @@ class ManualCCSearch(object):
     # Gremlin operations
     ORDER_LN = ".order{it.a.lineno <=> it.b.lineno}" # Order by linenumber
     
-    QUERIES_DIR = "/shared_data/workspace/ccdetection/gremlin_queries/"
-    
     def __init__(self, port):
         '''
         Constructor
@@ -33,6 +32,9 @@ class ManualCCSearch(object):
         self.j.setGraphDbURL('http://localhost:%d/db/data/' % (int(port)))
         self.j.addStepsDir("/opt/python-joern/joern/phpjoernsteps")
         self.j.connectToDatabase()
+        
+        self.QUERIES_DIR = Configurator.getPath(Configurator.BASE_DIR) + \
+                        "/gremlin_queries" 
         
     def searchCCOne(self):
         """

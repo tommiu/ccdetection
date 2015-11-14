@@ -13,11 +13,14 @@ import itertools
 from LazyMP import LazyMP
 from LazyMP import ProcessIdGenerator
 from neo4j_helper import Neo4jHelper
+from configurator import Configurator
 
 ARGS_HELP    = "help"
 ARGS_SEARCH  = "search"
 ARGS_CONFIG  = "config"
 ARGS_CONSOLE = "console"
+
+CONFIG_PATH  = "./config"
 
 def main(argv):
     # Setup command line arguments.
@@ -31,6 +34,9 @@ def main(argv):
         parser.printHelp(argv[0])
         sys.exit()
 
+    # Load config.
+    Configurator.load(CONFIG_PATH)
+
     if flow[parser.KEY_MODE] == ARGS_HELP:
         parser.printHelp(argv[0])
         sys.exit()
@@ -42,11 +48,14 @@ def main(argv):
         startSearchMode(flow)
         
     elif flow[parser.KEY_MODE] == ARGS_CONFIG:
-        pass
+        setupConfig(getArg(flow, "p", "path"))
 
     else:
         parser.printHelp(argv[0])
         sys.exit()
+
+def setupConfig(configurator, path):
+    pass
 
 def startSearchMode(flow):
     flow["in"] = os.path.abspath(flow["in"])
@@ -132,7 +141,7 @@ def startSearchMode(flow):
                             )
 
 def analyseDataHelper(args):
-    Neo4jHelper.analyseData(args)
+    return Neo4jHelper.analyseData(args)
 
 def getRootDirectories(path, level):    
     """
