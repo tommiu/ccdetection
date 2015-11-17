@@ -32,8 +32,10 @@ else
 fi
 
 INSTALL_PATH=$1
-NEO4J_BASEDIR=$1/neo4j-2.1/
+NEO4J_BASEDIR=$1/neo4j
 CPUS=$2
+
+THIS_SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 if (("$SKIP" == "0")) ; then
 sudo apt-get update
@@ -234,18 +236,12 @@ fi
 fi
 
 # Get directory path of this script.
-if (("$SKIP" < "21")) ; then
-if ! SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-    then
-    informRestart $1 $2 20
-    exit
-fi
-fi
+#SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # Utilities installation DONE.
 # Configure ccdetection with installed paths.
 if (("$SKIP" < "22")) ; then
-if ! python $SCRIPT_DIR/main.py config $INSTALL_PATH
+if ! python $THIS_SCRIPT_DIR/main.py config -p $INSTALL_PATH
     then
     informRestart $1 $2 21
     exit
@@ -254,9 +250,11 @@ fi
 
 # Link neo4j databases
 if (("$SKIP" < "23")) ; then
-if ! ln -s $SCRIPT_DIR/graphs/graph1.db $NEO4J_BASEDIR/neo4j-01/data/graph.db || ! ln -s $SCRIPT_DIR/graphs/graph2.db $NEO4J_BASEDIR/neo4j-02/data/graph.db || ! ln -s $SCRIPT_DIR/graphs/graph3.db $NEO4J_BASEDIR/neo4j-03/data/graph.db || ! ln -s $SCRIPT_DIR/graphs/graph4.db $NEO4J_BASEDIR/neo4j-04/data/graph.db
+if ! ln -s $THIS_SCRIPT_DIR/graphs/graph1.db $NEO4J_BASEDIR/neo4j-01/data/graph.db || ! ln -s $THIS_SCRIPT_DIR/graphs/graph2.db $NEO4J_BASEDIR/neo4j-02/data/graph.db || ! ln -s $THIS_SCRIPT_DIR/graphs/graph3.db $NEO4J_BASEDIR/neo4j-03/data/graph.db || ! ln -s $THIS_SCRIPT_DIR/graphs/graph4.db $NEO4J_BASEDIR/neo4j-04/data/graph.db
     then
     informRestart $1 $2 22
     exit
 fi
 fi
+
+echo "Installation finished! Start using ccdetection using 'python2 main.py help'"
