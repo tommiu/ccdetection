@@ -67,6 +67,8 @@ fi
 cd python-joern
 git checkout portPHPJoern
 
+cd $INSTALL_PATH
+
 # Install custom gremlin steps for python-joern.
 cp -r $THIS_SCRIPT_DIR/custom_gremlin_steps $INSTALL_PATH/python-joern/joern/phpjoernsteps/.
 
