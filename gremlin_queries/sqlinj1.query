@@ -1,0 +1,47 @@
+// This query only matches the code from "sqlinj1.php".
+
+
+def printNode(node) {
+    "Node: [\n" +
+    "\"childnum\": " + node.childnum + ",\n" +
+    "\"id\": " + node.id + ",\n" +
+    "\"type\": " + node.type + "\n" +
+    "\"code\": " + node.code + "\n" +
+    "]"
+}
+
+def printFoundCC(line_start, line_end, file_name) {
+    "Found a code clone on lines " + line_start + " to " + line_end + "\n" +
+    "File: " + file_name
+}
+
+g.v(0).sideEffect{ filename = it.name }
+// Start from the AST_STMT_LIST node (id=1) instead of the file node (id=0).
+// g.v(1).as("start")
+.out.as("start")
+// g.v(1).transform{ "abc" }.next().back("x")
+
+// filter out invalid nodes (type = NULL)
+.filter{ it.type != "NULL" }
+
+// get first - AST_ASSIGN
+.ithChildren(0)
+.filter{ isAssignment(it) }
+.sideEffect{ start_linenumber = it.lineno }
+// .filter{ it.type == "abc" }
+// get variable node of assignment and remember it
+// .lval().as("x")
+
+// .lval().next().sideEffect{ var1 = it }.next().transform{ printNode(var1) }.next();
+
+// get second - AST_ASSIGN
+.back("start")
+.ithChildren(1)
+.filter{ isAssignment(it) }
+
+// get third - AST_ASSIGN, FLAG = "ASSIGN_CONCAT"
+.back("start")
+.ithChildren(2)
+.filter{ isConcatAssignment(it) }
+.sideEffect{ end_linenumber = it.lineno }
+.transform{ printFoundCC(start_linenumber, end_linenumber, filename) }
