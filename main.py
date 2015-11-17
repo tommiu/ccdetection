@@ -20,7 +20,7 @@ ARGS_SEARCH  = "search"
 ARGS_CONFIG  = "config"
 ARGS_CONSOLE = "console"
 
-CONFIG_PATH  = "./config"
+CONFIG_PATH  = "config"
 
 def main(argv):
     # Setup command line arguments.
@@ -34,8 +34,17 @@ def main(argv):
         parser.printHelp(argv[0])
         sys.exit()
 
-    # Load config.
-    Configurator.load(CONFIG_PATH)
+    # Make config point to the absolute path.
+    full_path = os.path.abspath(argv[0])
+    last_slash_index = full_path.rfind("/")
+    base_dir = full_path[0:last_slash_index]
+    
+    global CONFIG_PATH
+    CONFIG_PATH = base_dir + "/" + CONFIG_PATH
+
+    if flow[parser.KEY_MODE] != ARGS_CONFIG:
+        # Load config.
+        Configurator.load(CONFIG_PATH)
 
     if flow[parser.KEY_MODE] == ARGS_HELP:
         parser.printHelp(argv[0])
@@ -48,14 +57,13 @@ def main(argv):
         startSearchMode(flow)
         
     elif flow[parser.KEY_MODE] == ARGS_CONFIG:
-        setupConfig(getArg(flow, "p", "path"))
+        Configurator().setupConfig(
+                                CONFIG_PATH, base_dir, getArg(flow, "p", "path")
+                                )
 
     else:
         parser.printHelp(argv[0])
         sys.exit()
-
-def setupConfig(configurator, path):
-    pass
 
 def startSearchMode(flow):
     flow["in"] = os.path.abspath(flow["in"])
