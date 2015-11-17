@@ -67,6 +67,9 @@ fi
 cd python-joern
 git checkout portPHPJoern
 
+# Install custom gremlin steps for python-joern.
+cp -r $THIS_SCRIPT_DIR/custom_gremlin_steps $INSTALL_PATH/python-joern/joern/phpjoernstepsi/.
+
 if (("$SKIP" < "4")) ; then
 # Download PHP7 - ~160 MB
 if ! mkdir php7
