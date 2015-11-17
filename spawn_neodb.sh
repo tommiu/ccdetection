@@ -16,26 +16,30 @@ function readVal {
         key=$(echo $p | cut -f1 -d=)
         path=$(echo $p | cut -f2 -d=)
 
-        if [ $key = $1 ] ; then
+        if [ $key = $2 ] ; then
             echo "$path"
         fi
     done < $1
 }
 
-PATH_NEO4J=$(readVal "neo4j")
-PATH_PHPJOERN=$(readVal "phpjoern")
-PATH_GRAPHDBS=$(readVal "graphdbs")
-PATH_BATCH_IMPORT=$(readVal "batch_import")
-exit
+PATH_NEO4J=$(readVal $1 "neo4j")
+PATH_PHPJOERN=$(readVal $1 "phpjoern")
+PATH_GRAPHDBS=$(readVal $1 "graphdbs")
+PATH_BATCH_IMPORT=$(readVal $1 "batch_import")
 
-rm /opt/phpjoern/graphs/graph${2}.db/ -r
+# Delete old database
+rm $PATH_GRAPHDBS/graph${2}.db/ -r
 
 if [ -z "$JEXP_HOME" ]; then
-    JEXP_HOME=$PATH_BATCH_IMPORT
+    JEXP_HOME=`echo $PATH_BATCH_IMPORT`
 fi
-echo "Got path $2"
+
+# Create PHP AST from path.
 ${PATH_PHPJOERN}/parser_$3 "$2"
 
+# Create graph database from AST.
 HEAP=6G; java -classpath "$JEXP_HOME/lib/*" -Xmx$HEAP -Xms$HEAP -Dfile.encoding=UTF-8 org.neo4j.batchimport.Importer /opt/phpjoern/conf/batch.properties ${PATH_GRAPHDBS}/graph${3}.db ${PATH_PHPJOERN}/nodes.csv${3} ${PATH_PHPJOERN}/rels.csv${3}
+exit
 
+# Start neo4j graph database server.
 ${PATH_NEO4J}/neo4j-0${3}/bin/neo4j console
