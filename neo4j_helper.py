@@ -56,7 +56,11 @@ class Neo4jHelper(object):
         print "Analysing path: %s" % path
         process = pexpect.spawn(
                             Configurator.getPath(Configurator.KEY_SPAWN_SCRIPT),
-                            [path, str(process_number)], 360
+                            [
+                    Configurator.getPath(Configurator.KEY_BASE_DIR) + "/config", 
+                    path, str(process_number)
+                    ],
+                            360
                             )
         
         expectation = process.expect([
@@ -79,9 +83,10 @@ class Neo4jHelper(object):
     #     print "Using path %s" % path
         process = subprocess.call(
                             [
-                        Configurator.getPath(Configurator.KEY_SPAWN_SCRIPT),
-                        path, "1"
-                        ],
+                    Configurator.getPath(Configurator.KEY_SPAWN_SCRIPT),
+                    Configurator.getPath(Configurator.KEY_BASE_DIR) + "/config", 
+                    path, "1"
+                    ],
                             preexec_fn=os.setsid
                             )
         
