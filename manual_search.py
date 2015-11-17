@@ -31,7 +31,7 @@ class ManualCCSearch(object):
         self.j = JoernSteps()
         self.j.setGraphDbURL('http://localhost:%d/db/data/' % (int(port)))
         self.j.addStepsDir(
-                        Configurator.getPath(Configurator.PATH_PYTHON_JOERN) + 
+                        Configurator.getPath(Configurator.KEY_PYTHON_JOERN) + 
                         "/joern/phpjoernsteps"
                         )
         self.j.connectToDatabase()

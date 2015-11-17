@@ -55,7 +55,7 @@ class Neo4jHelper(object):
     def prepareData(path, process_number=1):
         print "Analysing path: %s" % path
         process = pexpect.spawn(
-                            Configurator.getPath(Configurator.SPAWN_SCRIPT),
+                            Configurator.getPath(Configurator.KEY_SPAWN_SCRIPT),
                             [path, str(process_number)], 360
                             )
         
@@ -79,7 +79,7 @@ class Neo4jHelper(object):
     #     print "Using path %s" % path
         process = subprocess.call(
                             [
-                        Configurator.getPath(Configurator.SPAWN_SCRIPT),
+                        Configurator.getPath(Configurator.KEY_SPAWN_SCRIPT),
                         path, "1"
                         ],
                             preexec_fn=os.setsid
