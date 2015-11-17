@@ -40,7 +40,7 @@ THIS_SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 if (("$SKIP" == "0")) ; then
 sudo apt-get update
 # Following tools will be used to install everything:
-sudo apt-get install autoconf bison flex maven unzip libxml2-dev -y
+sudo apt-get install autoconf bison flex maven unzip libxml2-dev python-setuptools python-dev -y
 
 fi
 
