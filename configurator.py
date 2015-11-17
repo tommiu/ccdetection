@@ -23,7 +23,7 @@ class Configurator(object):
     PATH_PHP_JOERN = "phpjoern"
     PATH_SPAWN_SCRIPT = "spawn_neodb.sh"
     PATH_PYTHON_JOERN = "python-joern"
-    PATH_BATCH_IMPORT = "batch-import-2.1"
+    PATH_BATCH_IMPORT = "batch-import"
     
     def __init__(self):
         pass
