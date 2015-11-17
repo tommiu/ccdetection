@@ -219,6 +219,8 @@ if ! mkdir $INSTALL_PATH/batch-import
 fi
 fi
 
+cd /tmp
+
 if (("$SKIP" < "19")) ; then
 if ! curl -O https://dl.dropboxusercontent.com/u/14493611/batch_importer_21.zip
 	then
@@ -238,6 +240,13 @@ fi
 # Get directory path of this script.
 #SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
+# Install python-joern globally.
+if (("$SKIP" < "21")) ; then
+wget https://github.com/fabsx00/python-joern/archive/0.3.1.tar.gz
+tar xfzv 0.3.1.tar.gz
+cd python-joern-0.3.1
+sudo python2 setup.py install
+fi
 # Utilities installation DONE.
 # Configure ccdetection with installed paths.
 if (("$SKIP" < "22")) ; then
