@@ -106,47 +106,47 @@ def startSearchMode(flow):
             print "An exception occured: %s" % err
             sys.exit()
 
-    projects_analysed = 0
+        projects_analysed = 0
+        
+        if multithreads > 1:
+            # Multithreading was specified.
+            
+            process_number_generator = ProcessIdGenerator()
+            
+            # Start a lazy pool of processes.
+            pool = LazyMP().poolImapUnordered(
+                    analyseDataHelper, itertools.izip(
+                            itertools.repeat(code), path_generator, 
+                            process_number_generator.getGenerator([1,2,3,4]),
+                            ),
+                    multithreads,
+                    process_number_generator
+                    )
     
-    if multithreads > 1:
-        # Multithreading was specified.
-        
-        process_number_generator = ProcessIdGenerator()
-        
-        # Start a lazy pool of processes.
-        pool = LazyMP().poolImapUnordered(
-                analyseDataHelper, itertools.izip(
-                        itertools.repeat(code), path_generator, 
-                        process_number_generator.getGenerator([1,2,3,4]),
-                        ),
-                multithreads,
-                process_number_generator
-                )
-
-        # And let them work.
-        try:
-            while True:
-                # Let multiprocessing pool process all arguments.
-                pool.next()
+            # And let them work.
+            try:
+                while True:
+                    # Let multiprocessing pool process all arguments.
+                    pool.next()
+                    projects_analysed += 1
+                    
+            except Exception as err:
+                # Done
+                print err
+                pass
+    
+        else:    
+            # No multithreading.
+            for path in path_generator:
+                neo4j_helper.analyseData((
+                        code, path, 1
+                        ))
                 projects_analysed += 1
-                
-        except Exception as err:
-            # Done
-            print err
-            pass
-
-    else:    
-        # No multithreading.
-        for path in path_generator:
-            neo4j_helper.analyseData((
-                    code, path, 1
-                    ))
-            projects_analysed += 1
-    
-    if projects_analysed == 0:
-        print "No project analysed for path: '%s'" %(
-                            flow["in"]
-                            )
+        
+        if projects_analysed == 0:
+            print "No project analysed for path: '%s'" %(
+                                flow["in"]
+                                )
 
 def analyseDataHelper(args):
     return Neo4jHelper.analyseData(args)

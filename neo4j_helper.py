@@ -48,7 +48,6 @@ class Neo4jHelper(object):
             Neo4jHelper.killProcess(process_number)
             Neo4jHelper.analyseData(code_and_path_and_process_number)
         
-        print "process number:", process_number
         return process_number
     
     @staticmethod

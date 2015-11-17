@@ -38,8 +38,7 @@ fi
 ${PATH_PHPJOERN}/parser_$3 "$2"
 
 # Create graph database from AST.
-HEAP=6G; java -classpath "$JEXP_HOME/lib/*" -Xmx$HEAP -Xms$HEAP -Dfile.encoding=UTF-8 org.neo4j.batchimport.Importer /opt/phpjoern/conf/batch.properties ${PATH_GRAPHDBS}/graph${3}.db ${PATH_PHPJOERN}/nodes.csv${3} ${PATH_PHPJOERN}/rels.csv${3}
-exit
+HEAP=6G; java -classpath "$JEXP_HOME/lib/*" -Xmx$HEAP -Xms$HEAP -Dfile.encoding=UTF-8 org.neo4j.batchimport.Importer ${PATH_PHPJOERN}/conf/batch.properties ${PATH_GRAPHDBS}/graph${3}.db ${PATH_PHPJOERN}/nodes.csv${3} ${PATH_PHPJOERN}/rels.csv${3}
 
 # Start neo4j graph database server.
 ${PATH_NEO4J}/neo4j-0${3}/bin/neo4j console
