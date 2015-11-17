@@ -63,6 +63,10 @@ if ! git clone ssh://git@service.cispa.uni-saarland.de:2222/python-joern.git
 fi
 fi
 
+# Get PHPJoernSteps extension for python-joern.
+cd python-joern
+git checkout portPHPJoern
+
 if (("$SKIP" < "4")) ; then
 # Download PHP7 - ~160 MB
 if ! mkdir php7
