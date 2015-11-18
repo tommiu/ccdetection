@@ -4,6 +4,7 @@ Created on Nov 14, 2015
 @author: Tommi Unruh
 '''
 import os
+import sys
 
 class Configurator(object):
     """
@@ -14,16 +15,20 @@ class Configurator(object):
     KEY_GRAPHDBS  = "graphdbs"
     KEY_BASE_DIR  = "basedir"
     KEY_PHP_JOERN = "phpjoern"
+    KEY_PHP_PARSER   = "php_parser"
     KEY_SPAWN_SCRIPT = "spawn_script"
     KEY_PYTHON_JOERN = "python_joern"
     KEY_BATCH_IMPORT = "batch_import"
+    KEY_PHP_PARSE_RESULTS = "php_parser_results"
     
     PATH_NEO4j = "neo4j"
     PATH_GRAPHDBS  = "graphs"
     PATH_PHP_JOERN = "phpjoern"
+    PATH_PHP_PARSER   = "AST_parser"
     PATH_SPAWN_SCRIPT = "spawn_neodb.sh"
     PATH_PYTHON_JOERN = "python-joern"
     PATH_BATCH_IMPORT = "batch-import"
+    PATH_PHP_PARSE_RESULTS = "parse_results"
     
     def __init__(self):
         pass
@@ -83,6 +88,11 @@ class Configurator(object):
         config_dict[self.KEY_BATCH_IMPORT] = path + "/" + self.PATH_BATCH_IMPORT
         config_dict[self.KEY_SPAWN_SCRIPT] = base_dir + "/" + \
                                                 self.PATH_SPAWN_SCRIPT 
+        config_dict[self.KEY_PHP_PARSER] = base_dir + "/" + self.PATH_PHP_PARSER
+        config_dict[self.KEY_PHP_PARSE_RESULTS] = (
+                                    config_dict[self.KEY_PHP_PARSER] + "/" +
+                                    self.PATH_PHP_PARSE_RESULTS
+                                    )
         
         self.writeConfigFile(
                         config_path,
@@ -112,7 +122,6 @@ class Configurator(object):
     @staticmethod
     def getPath(_key):
         val = Configurator.config[_key]
-        
         if val:
             return val
         else:

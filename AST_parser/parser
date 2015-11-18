@@ -1,0 +1,15 @@
+#!/bin/bash
+
+if [ -z "$PHP7" ]; then
+    PHP7=$HOME/php7/usr/bin/php
+fi
+
+path_to_parse=$1
+RESULT_PATH=$2
+appendix=$3
+PHPJOERN=$4
+
+$PHP7 $PHPJOERN/src/Parser.php -a "$appendix" -f jexp "$path_to_parse"
+
+mv nodes.csv${appendix} $RESULT_PATH
+mv rels.csv${appendix} $RESULT_PATH

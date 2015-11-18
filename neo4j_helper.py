@@ -35,7 +35,8 @@ class Neo4jHelper(object):
             process = Neo4jHelper.prepareData(path, process_number)
             cc_tester = ManualCCSearch(port)
             cc_tester.runTimedQuery(cc_tester.runQuery, query=code)
-    
+
+            # Kill neo4j database server.
             process.sendcontrol('c')
             process.close()
     
@@ -57,7 +58,8 @@ class Neo4jHelper(object):
                             Configurator.getPath(Configurator.KEY_SPAWN_SCRIPT),
                             [
                     Configurator.getPath(Configurator.KEY_BASE_DIR) + "/config", 
-                    path, str(process_number)
+                    path, str(process_number),
+                    Configurator.getPath(Configurator.KEY_PHP_PARSE_RESULTS) 
                     ],
                             360
                             )
@@ -69,7 +71,6 @@ class Neo4jHelper(object):
                             ])
     
         if expectation == 2:
-    #         print process.before
             raise BindException()
         
         return process
@@ -84,7 +85,8 @@ class Neo4jHelper(object):
                             [
                     Configurator.getPath(Configurator.KEY_SPAWN_SCRIPT),
                     Configurator.getPath(Configurator.KEY_BASE_DIR) + "/config", 
-                    path, "1"
+                    path, "1",
+                    Configurator.getPath(Configurator.KEY_PHP_PARSE_RESULTS)
                     ],
                             preexec_fn=os.setsid
                             )
