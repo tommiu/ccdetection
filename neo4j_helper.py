@@ -42,7 +42,7 @@ class Neo4jHelper(object):
         except BindException as err:
             print (
                 "Port %d is taken. Trying to kill a neo4j graph database "
-                "listening on that port and start an updated one."
+                "listening on that port and start an updated one." % port
                 )
             
             Neo4jHelper.killProcess(process_number)
