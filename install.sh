@@ -60,6 +60,17 @@ fi
 
 _CTR=`expr $_CTR + 1`
 if (("$SKIP" < "$_CTR")) ; then
+# Copy extended PHP parser script into phpjoern
+if ! cp $THIS_SCRIPT_DIR/AST_parser/Parser.php phpjoern/src/Parser.php
+    /opt/phpjoern/src/Parser.php
+then
+	informRestart $1 $2 $_CTR
+	exit
+fi
+fi
+
+_CTR=`expr $_CTR + 1`
+if (("$SKIP" < "$_CTR")) ; then
 if ! git clone ssh://git@service.cispa.uni-saarland.de:2222/python-joern.git
 then
 	informRestart $1 $2 $_CTR
