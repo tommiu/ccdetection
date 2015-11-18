@@ -39,6 +39,11 @@ THIS_SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 _CTR=0
 
+echo "The install script requires sudo privileges for some steps. These steps are:"
+echo "apt-get update"
+echo "apt-get install autoconf bison flex maven unzip libxml2-dev python-setuptools python-dev -y"
+echo "(For python-joern 0.3.1) python2 setup.py install"
+
 if (("$SKIP" == "$_CTR")) ; then
 sudo apt-get update
 # Following tools will be used to install everything:
