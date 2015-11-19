@@ -103,6 +103,11 @@ class Configurator(object):
             # Ignore the race condition here, it does not matter.
             # Create the directory for the several graph databases.
             os.makedirs(config_dict[self.KEY_GRAPHDBS])
+            
+        if not os.path.exists(config_dict[self.KEY_PHP_PARSE_RESULTS]):
+            # Ignore the race condition here, it does not matter.
+            # Create the directory for the several graph databases.
+            os.makedirs(config_dict[self.KEY_PHP_PARSE_RESULTS])
         
         # Write the server config file for every neoj4 instance.
         # They differ in the ports (http and https) they use.
