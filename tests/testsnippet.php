@@ -1,5 +1,6 @@
-<?php
 // Comments show the abstract version of the PHP code.
+
+<?php
 
 // var1 = $_whatever
 $user_alcohol_permitted_selection = $_POST['alcohol_check']; //Value sent using jquery .load()
