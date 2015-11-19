@@ -5,6 +5,7 @@ Created on Nov 14, 2015
 '''
 import os
 import sys
+import stat
 
 class Configurator(object):
     """
@@ -106,7 +107,7 @@ class Configurator(object):
             
         if not os.path.exists(config_dict[self.KEY_PHP_PARSE_RESULTS]):
             # Ignore the race condition here, it does not matter.
-            # Create the directory for the several graph databases.
+            # Create the directory for the PHP AST parsing results.
             os.makedirs(config_dict[self.KEY_PHP_PARSE_RESULTS])
         
         # Write the server config file for every neoj4 instance.
@@ -117,6 +118,15 @@ class Configurator(object):
         self.writeNeo4jConfig(neo_4j_path % 2, 7475, 7485)
         self.writeNeo4jConfig(neo_4j_path % 3, 7476, 7486)
         self.writeNeo4jConfig(neo_4j_path % 4, 7477, 7487)
+        
+        # Make scripts executable
+        filepath = config_dict[self.KEY_SPAWN_SCRIPT]
+        st = os.stat(filepath)
+        os.chmod(filepath, st.st_mode | stat.S_IEXEC)
+        
+        filepath = config_dict[self.KEY_PHP_PARSER] + "/parser"
+        st = os.stat(filepath)
+        os.chmod(filepath, st.st_mode | stat.S_IEXEC)
     
     def writeConfigFile(self, filepath, _dict):
         config_format = "%s = %s"
