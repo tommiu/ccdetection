@@ -1,5 +1,11 @@
 #!/bin/bash
 
+if [ -z "$1" ] || [ -z "$2" ] || [ -z "$3" ] || [ -z "$4" ]; then
+    echo "You need to specify four program arguments:"
+    echo "1. Path to the PHP project to parse. 2. The output directory for the resulting files. 3. The graph database id (1-4). 4. The base directory of phpjoern."
+    exit
+fi
+
 if [ -z "$PHP7" ]; then
     PHP7=$HOME/php7/usr/bin/php
 fi
