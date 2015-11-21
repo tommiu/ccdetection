@@ -42,6 +42,15 @@ def main(argv):
     global CONFIG_PATH
     CONFIG_PATH = base_dir + "/" + CONFIG_PATH
 
+    # Set debugging.
+    try:
+        getArg(flow, "d", "debug")
+        Configurator.setDebugging(True)
+    
+    except ArgException as err:
+#         # Debugging was not specified.
+        pass
+        
     if flow[parser.KEY_MODE] != ARGS_CONFIG:
         # Load config.
         Configurator.load(CONFIG_PATH)
@@ -215,7 +224,8 @@ def setupArgs(parser):
                 "you can analyse each project on its own by "
                 "specifying -l/--level 1. Level==1 means, that "
                 "the top level directory of each project is one directory "
-                "deeper than the path specified."
+                "deeper than the path specified. "
+                "-d/--debug enables debugging output."
                 )
     parser.addArgumentsCombination(
                                 ARGS_SEARCH,
@@ -225,7 +235,8 @@ def setupArgs(parser):
                             ],
                                 [
                             ["l=", "level"],
-                            ["m=", "multithreading"]
+                            ["m=", "multithreading"],
+                            ["d", "debug"]
                             ],
                                 explanation=explanation
                                 )

@@ -47,6 +47,8 @@ fi
 # 2. Output directory.
 # 3. Appendix to filename (to distinguish output from multiple php parses).
 # 4. Path to PHPJOERN
+echo "${PATH_PHPPARSER}/parser $PHP_PROJECT_PATH $PARSE_OUTPUT_DIR $GRAPH_ID $PATH_PHPJOERN"
+echo "$JEXP_HOME ${PATH_GRAPHDBS} ${PATH_PHPPARSE_RESULTS}"
 ${PATH_PHPPARSER}/parser $PHP_PROJECT_PATH $PARSE_OUTPUT_DIR $GRAPH_ID $PATH_PHPJOERN
 
 # Create graph database from AST.

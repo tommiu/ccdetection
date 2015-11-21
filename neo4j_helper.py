@@ -8,8 +8,8 @@ import pexpect
 import subprocess
 import os
 import signal
-import sys
 from configurator import Configurator
+import sys
 
 class Neo4jHelper(object):
     """
@@ -54,6 +54,7 @@ class Neo4jHelper(object):
     @staticmethod
     def prepareData(path, process_number=1):
         print "Analysing path: %s" % path
+
         process = pexpect.spawn(
                             Configurator.getPath(Configurator.KEY_SPAWN_SCRIPT),
                             [
@@ -64,15 +65,23 @@ class Neo4jHelper(object):
                             360
                             )
         
+        if Configurator.isDebuggingEnabled():
+            process.logfile = sys.stdout
+        
         expectation = process.expect([
                             "graph.db still exists", 
                             "Remote interface ready", 
                             "java.net.BindException",
+                            pexpect.EOF
                             ])
     
         if expectation == 2:
             raise BindException()
         
+        elif expectation == 3:
+            # EOF
+            raise BindException()
+
         return process
     
     def startConsole(self, path):

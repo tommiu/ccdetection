@@ -4,7 +4,6 @@ Created on Nov 14, 2015
 @author: Tommi Unruh
 '''
 import os
-import sys
 import stat
 
 class Configurator(object):
@@ -30,6 +29,8 @@ class Configurator(object):
     PATH_PYTHON_JOERN = "python-joern"
     PATH_BATCH_IMPORT = "batch-import"
     PATH_PHP_PARSE_RESULTS = "parse_results"
+    
+    debugging = False
     
     def __init__(self):
         pass
@@ -133,6 +134,14 @@ class Configurator(object):
         with open(filepath, 'w') as fh:
             for key in _dict:
                 fh.write(config_format % (key, _dict[key]) + "\n")
+    
+    @staticmethod
+    def isDebuggingEnabled():
+        return Configurator.debugging
+    
+    @staticmethod
+    def setDebugging(_bool):
+        Configurator.debugging = _bool
     
     @staticmethod
     def getPath(_key):

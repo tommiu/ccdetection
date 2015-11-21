@@ -381,4 +381,7 @@ then
 fi
 fi
 
-echo "Installation finished! Start using ccdetection using 'python2 main.py help'"
+echo "Installation finished!"
+echo "Python dependencies were not installied. You will need the following python packages:"
+echo "pexpect"
+echo "Start using ccdetection using 'python2 main.py help'"
