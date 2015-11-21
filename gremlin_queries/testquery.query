@@ -1,79 +1,34 @@
-//
-//
-// This query matches the code from "sqlinj1.php", in any AST.
-// It respects variable occurences.
-//
-//
-
 def printFoundCC(line_start, line_end, file_name) {
-    "Found a code clone on lines " + line_start + " to " + line_end + "\n" +
-    "File: " + file_name
+"Found a code clone on lines " + line_start + " to " + line_end + "\n" + "File: " + file_name
 }
 
-// Variable to remember the position of a child node.
-// Necessary to check for code clones "line by line
-// (= AST-Node by AST-Node in order)"
 childnumber = 0
 
 g.V
-
-// Filter out invalid nodes (type = NULL).
 .filter{ it.type != "NULL" }
-
-// First line of code: AST_ASSIGN, rval == "AST_DIM"
-.filter{ isAssignment(it) && it.rval().type.next() == "AST_DIM" }
-
-// Remeber its linenumber.
 .sideEffect{ start_linenumber = it.lineno }
-
-// Remember its position as a child.
+.filter{ isAssignment(it) }
+.filter{ it.rval().type.next() == "AST_DIM" }
+.sideEffect{ user_alcohol_permitted_selection = it.lval().varToName() }
 .sideEffect{ childnumber = it.childnum }
-
-// Remember the assigned variable name (left side).
-.sideEffect{ var1 = it.lval().varToName() }
-
-// Second line of code: AST_ASSIGN, rval == "AST_ENCAPS_LIST"
-// Find it by going back one step and check the next child.
-.parents()
-.children().filter{ it.childnum == childnumber + 1}
-.filter{ isAssignment(it) && it.rval().type.next() == "AST_ENCAPS_LIST" }
-
-// Its AST_ENCAPS_LIST node must have two properties:
-// Its first child has to be a string.
-.filter{ it.rval().ithChildren(0).type.next() == "string" }
-
-// Its second child has to be an AST_VAR.
-.filter{ it.rval().ithChildren(1).type.next() == "AST_VAR" }
-
-// Remember AST_ASSIGN's position as a child.
-.sideEffect{ childnumber = childnumber + 1 }
-
-// Remember the assigned variable name (left side).
-.sideEffect{ var2 = it.lval().varToName() }
-
-// Third line of code: AST_ASSIGN, FLAG = "ASSIGN_CONCAT"
 .parents()
 .children().filter{ it.childnum == childnumber + 1 }
-.filter{ isConcatAssignment(it) }
 
-// Check if this assignment's variable name is the variable from 
-// second line of code (var2).
-.filter{ it.lval().varToName().next() == var2.next() }
-
-// Right side should be an AST_ENCAPS_LIST
+.filter{ isAssignment(it) }
 .filter{ it.rval().type.next() == "AST_ENCAPS_LIST" }
-
-// with first child == "string"
+.sideEffect{ query = it.lval().varToName() }
+.sideEffect{ childnumber = childnumber + 1 }
 .filter{ it.rval().ithChildren(0).type.next() == "string" }
+.filter{ it.rval().ithChildren(1).type.next() == "AST_VAR" }
+.parents()
+.children().filter{ it.childnum == childnumber + 1 }
 
-// and second child type == "AST_VAR" with name of 'var1' (from first LoC).
-.filter{ it.rval().ithChildren(1).type.next() == "AST_VAR" && var1.next() == it.rval().ithChildren(1).varToName().next() }
+.filter{ isConcatAssignment(it) }
+.filter{ it.rval().type.next() == "AST_ENCAPS_LIST" }
+.filter{ it.lval().varToName().next() == query.next() }
+.filter{ it.rval().ithChildren(0).type.next() == "string" }
+.filter{ it.rval().ithChildren(1).type.next() == "AST_VAR" }
 
-// Get its linenumber.
 .sideEffect{ end_linenumber = it.lineno }
-
-// Get the filename.
 .toFile().sideEffect{ filename = it.name }
-
-// Print out the found code clone result (if it exists).
 .transform{ printFoundCC(start_linenumber, end_linenumber, filename) }
