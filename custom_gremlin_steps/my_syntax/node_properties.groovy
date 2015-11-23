@@ -19,3 +19,6 @@ Gremlin.defineStep('hasFlag', [Vertex, Pipe], { p ->
             }
 })
 
+Object.metaClass.isIfNode = { it -> 
+    it.type == TYPE_IF
+}
