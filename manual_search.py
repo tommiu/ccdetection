@@ -34,6 +34,11 @@ class ManualCCSearch(object):
                         Configurator.getPath(Configurator.KEY_PYTHON_JOERN) + 
                         "/joern/phpjoernsteps"
                         )
+        
+        self.j.addStepsDir(
+                        Configurator.getPath(Configurator.KEY_BASE_DIR) +
+                        "/custom_gremlin_steps"
+                           )
         self.j.connectToDatabase()
         
 #         self.QUERIES_DIR = Configurator.getPath(Configurator.BASE_DIR) + \
