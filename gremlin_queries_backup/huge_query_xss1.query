@@ -1,0 +1,1347 @@
+def printFoundCC(line_start, line_end, file_name) {
+"Found a code clone on lines " + line_start + " to " + line_end + "\n" + "File: " + file_name
+}
+
+childnumber = 0
+
+g.V
+.filter{ it.type != "NULL" }
+
+// Parent #0
+.sideEffect{ start_linenumber = it.lineno }
+
+// Node: AST_IF
+.filter{ isType(it, "AST_IF") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: AST_IF_ELEM
+.filter{ isType(it, "AST_IF_ELEM") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: AST_ISSET
+.filter{ isType(it, "AST_ISSET") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: AST_DIM
+.filter{ isType(it, "AST_DIM") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: AST_VAR
+.filter{ isType(it, "AST_VAR") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: string
+.filter{ isType(it, "string") }
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Traverse to child #1
+.ithChildren(1)
+
+// Node: string
+.filter{ isType(it, "string") }
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Traverse to child #1
+.ithChildren(1)
+
+// Node: AST_STMT_LIST
+.filter{ isType(it, "AST_STMT_LIST") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: AST_IF
+.filter{ isType(it, "AST_IF") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: AST_IF_ELEM
+.filter{ isType(it, "AST_IF_ELEM") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: AST_ISSET
+.filter{ isType(it, "AST_ISSET") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: AST_DIM
+.filter{ isType(it, "AST_DIM") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: AST_VAR
+.filter{ isType(it, "AST_VAR") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: string
+.filter{ isType(it, "string") }
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Traverse to child #1
+.ithChildren(1)
+
+// Node: string
+.filter{ isType(it, "string") }
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Traverse to child #1
+.ithChildren(1)
+
+// Node: AST_STMT_LIST
+.filter{ isType(it, "AST_STMT_LIST") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: AST_IF
+.filter{ isType(it, "AST_IF") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: AST_IF_ELEM
+.filter{ isType(it, "AST_IF_ELEM") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: AST_CALL
+.filter{ isType(it, "AST_CALL") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: AST_NAME
+.filter{ isType(it, "AST_NAME") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: string
+.filter{ isType(it, "string") }
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Traverse to child #1
+.ithChildren(1)
+
+// Node: AST_ARG_LIST
+.filter{ isType(it, "AST_ARG_LIST") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: string
+.filter{ isType(it, "string") }
+
+// Go up one level.
+.parents()
+
+// Traverse to child #1
+.ithChildren(1)
+
+// Node: AST_DIM
+.filter{ isType(it, "AST_DIM") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: AST_VAR
+.filter{ isType(it, "AST_VAR") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: string
+.filter{ isType(it, "string") }
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Traverse to child #1
+.ithChildren(1)
+
+// Node: string
+.filter{ isType(it, "string") }
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Traverse to child #1
+.ithChildren(1)
+
+// Node: AST_STMT_LIST
+.filter{ isType(it, "AST_STMT_LIST") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: AST_ASSIGN
+.filter{ isType(it, "AST_ASSIGN") }
+.sideEffect{ name = it.lval().varToName() }
+.sideEffect{ childnumber = childnumber + 1 }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: AST_VAR
+.filter{ isType(it, "AST_VAR") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: string
+.filter{ isType(it, "string") }
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Traverse to child #1
+.ithChildren(1)
+
+// Node: AST_DIM
+.filter{ isType(it, "AST_DIM") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: AST_VAR
+.filter{ isType(it, "AST_VAR") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: string
+.filter{ isType(it, "string") }
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Traverse to child #1
+.ithChildren(1)
+
+// Node: string
+.filter{ isType(it, "string") }
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Traverse to child #1
+.ithChildren(1)
+
+// Node: AST_OR
+.filter{ isType(it, "AST_OR") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: AST_ASSIGN
+.filter{ isType(it, "AST_ASSIGN") }
+.sideEffect{ db = it.lval().varToName() }
+.sideEffect{ childnumber = childnumber + 1 }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: AST_VAR
+.filter{ isType(it, "AST_VAR") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: string
+.filter{ isType(it, "string") }
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Traverse to child #1
+.ithChildren(1)
+
+// Node: AST_CALL
+.filter{ isType(it, "AST_CALL") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: AST_NAME
+.filter{ isType(it, "AST_NAME") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: string
+.filter{ isType(it, "string") }
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Traverse to child #1
+.ithChildren(1)
+
+// Node: AST_ARG_LIST
+.filter{ isType(it, "AST_ARG_LIST") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: string
+.filter{ isType(it, "string") }
+
+// Go up one level.
+.parents()
+
+// Traverse to child #1
+.ithChildren(1)
+
+// Node: string
+.filter{ isType(it, "string") }
+
+// Go up one level.
+.parents()
+
+// Traverse to child #2
+.ithChildren(2)
+
+// Node: string
+.filter{ isType(it, "string") }
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Traverse to child #1
+.ithChildren(1)
+
+// Node: AST_EXIT
+.filter{ isType(it, "AST_EXIT") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: AST_BINARY_OP
+.filter{ isType(it, "AST_BINARY_OP") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: string
+.filter{ isType(it, "string") }
+
+// Go up one level.
+.parents()
+
+// Traverse to child #1
+.ithChildren(1)
+
+// Node: AST_CALL
+.filter{ isType(it, "AST_CALL") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: AST_NAME
+.filter{ isType(it, "AST_NAME") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: string
+.filter{ isType(it, "string") }
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Traverse to child #1
+.ithChildren(1)
+
+// Node: AST_ARG_LIST
+.filter{ isType(it, "AST_ARG_LIST") }
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Traverse to child #2
+.ithChildren(2)
+
+// Node: AST_ASSIGN
+.filter{ isType(it, "AST_ASSIGN") }
+.sideEffect{ mydb = it.lval().varToName() }
+.sideEffect{ childnumber = childnumber + 1 }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: AST_VAR
+.filter{ isType(it, "AST_VAR") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: string
+.filter{ isType(it, "string") }
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Traverse to child #1
+.ithChildren(1)
+
+// Node: AST_CALL
+.filter{ isType(it, "AST_CALL") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: AST_NAME
+.filter{ isType(it, "AST_NAME") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: string
+.filter{ isType(it, "string") }
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Traverse to child #1
+.ithChildren(1)
+
+// Node: AST_ARG_LIST
+.filter{ isType(it, "AST_ARG_LIST") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: string
+.filter{ isType(it, "string") }
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Traverse to child #3
+.ithChildren(3)
+
+// Node: AST_ASSIGN
+.filter{ isType(it, "AST_ASSIGN") }
+.sideEffect{ sql = it.lval().varToName() }
+.sideEffect{ childnumber = childnumber + 1 }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: AST_VAR
+.filter{ isType(it, "AST_VAR") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: string
+.filter{ isType(it, "string") }
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Traverse to child #1
+.ithChildren(1)
+
+// Node: AST_BINARY_OP
+.filter{ isType(it, "AST_BINARY_OP") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: AST_BINARY_OP
+.filter{ isType(it, "AST_BINARY_OP") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: AST_BINARY_OP
+.filter{ isType(it, "AST_BINARY_OP") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: AST_BINARY_OP
+.filter{ isType(it, "AST_BINARY_OP") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: string
+.filter{ isType(it, "string") }
+
+// Go up one level.
+.parents()
+
+// Traverse to child #1
+.ithChildren(1)
+
+// Node: AST_VAR
+.filter{ isType(it, "AST_VAR") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: string
+.filter{ isType(it, "string") }
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Traverse to child #1
+.ithChildren(1)
+
+// Node: string
+.filter{ isType(it, "string") }
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Traverse to child #1
+.ithChildren(1)
+
+// Node: AST_VAR
+.filter{ isType(it, "AST_VAR") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: string
+.filter{ isType(it, "string") }
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Traverse to child #1
+.ithChildren(1)
+
+// Node: string
+.filter{ isType(it, "string") }
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Traverse to child #4
+.ithChildren(4)
+
+// Node: AST_ASSIGN
+.filter{ isType(it, "AST_ASSIGN") }
+.sideEffect{ result = it.lval().varToName() }
+.sideEffect{ childnumber = childnumber + 1 }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: AST_VAR
+.filter{ isType(it, "AST_VAR") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: string
+.filter{ isType(it, "string") }
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Traverse to child #1
+.ithChildren(1)
+
+// Node: AST_CALL
+.filter{ isType(it, "AST_CALL") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: AST_NAME
+.filter{ isType(it, "AST_NAME") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: string
+.filter{ isType(it, "string") }
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Traverse to child #1
+.ithChildren(1)
+
+// Node: AST_ARG_LIST
+.filter{ isType(it, "AST_ARG_LIST") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: AST_VAR
+.filter{ isType(it, "AST_VAR") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: string
+.filter{ isType(it, "string") }
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Traverse to child #5
+.ithChildren(5)
+
+// Node: AST_WHILE
+.filter{ isType(it, "AST_WHILE") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: AST_ASSIGN
+.filter{ isType(it, "AST_ASSIGN") }
+.sideEffect{ row = it.lval().varToName() }
+.sideEffect{ childnumber = childnumber + 1 }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: AST_VAR
+.filter{ isType(it, "AST_VAR") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: string
+.filter{ isType(it, "string") }
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Traverse to child #1
+.ithChildren(1)
+
+// Node: AST_CALL
+.filter{ isType(it, "AST_CALL") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: AST_NAME
+.filter{ isType(it, "AST_NAME") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: string
+.filter{ isType(it, "string") }
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Traverse to child #1
+.ithChildren(1)
+
+// Node: AST_ARG_LIST
+.filter{ isType(it, "AST_ARG_LIST") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: AST_VAR
+.filter{ isType(it, "AST_VAR") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: string
+.filter{ isType(it, "string") }
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Traverse to child #1
+.ithChildren(1)
+
+// Node: AST_STMT_LIST
+.filter{ isType(it, "AST_STMT_LIST") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: AST_ASSIGN
+.filter{ isType(it, "AST_ASSIGN") }
+.sideEffect{ FirstName = it.lval().varToName() }
+.sideEffect{ childnumber = childnumber + 1 }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: AST_VAR
+.filter{ isType(it, "AST_VAR") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: string
+.filter{ isType(it, "string") }
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Traverse to child #1
+.ithChildren(1)
+
+// Node: AST_DIM
+.filter{ isType(it, "AST_DIM") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: AST_VAR
+.filter{ isType(it, "AST_VAR") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: string
+.filter{ isType(it, "string") }
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Traverse to child #1
+.ithChildren(1)
+
+// Node: string
+.filter{ isType(it, "string") }
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Traverse to child #1
+.ithChildren(1)
+
+// Node: AST_ASSIGN
+.filter{ isType(it, "AST_ASSIGN") }
+.sideEffect{ LastName = it.lval().varToName() }
+.sideEffect{ childnumber = childnumber + 1 }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: AST_VAR
+.filter{ isType(it, "AST_VAR") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: string
+.filter{ isType(it, "string") }
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Traverse to child #1
+.ithChildren(1)
+
+// Node: AST_DIM
+.filter{ isType(it, "AST_DIM") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: AST_VAR
+.filter{ isType(it, "AST_VAR") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: string
+.filter{ isType(it, "string") }
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Traverse to child #1
+.ithChildren(1)
+
+// Node: string
+.filter{ isType(it, "string") }
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Traverse to child #2
+.ithChildren(2)
+
+// Node: AST_ASSIGN
+.filter{ isType(it, "AST_ASSIGN") }
+.sideEffect{ ID = it.lval().varToName() }
+.sideEffect{ childnumber = childnumber + 1 }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: AST_VAR
+.filter{ isType(it, "AST_VAR") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: string
+.filter{ isType(it, "string") }
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Traverse to child #1
+.ithChildren(1)
+
+// Node: AST_DIM
+.filter{ isType(it, "AST_DIM") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: AST_VAR
+.filter{ isType(it, "AST_VAR") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: string
+.filter{ isType(it, "string") }
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Traverse to child #1
+.ithChildren(1)
+
+// Node: string
+.filter{ isType(it, "string") }
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Traverse to child #3
+.ithChildren(3)
+
+// Node: AST_STMT_LIST
+.filter{ isType(it, "AST_STMT_LIST") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: AST_ECHO
+.filter{ isType(it, "AST_ECHO") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: string
+.filter{ isType(it, "string") }
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Traverse to child #4
+.ithChildren(4)
+
+// Node: AST_STMT_LIST
+.filter{ isType(it, "AST_STMT_LIST") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: AST_ECHO
+.filter{ isType(it, "AST_ECHO") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: AST_BINARY_OP
+.filter{ isType(it, "AST_BINARY_OP") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: AST_BINARY_OP
+.filter{ isType(it, "AST_BINARY_OP") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: AST_BINARY_OP
+.filter{ isType(it, "AST_BINARY_OP") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: AST_BINARY_OP
+.filter{ isType(it, "AST_BINARY_OP") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: AST_BINARY_OP
+.filter{ isType(it, "AST_BINARY_OP") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: string
+.filter{ isType(it, "string") }
+
+// Go up one level.
+.parents()
+
+// Traverse to child #1
+.ithChildren(1)
+
+// Node: AST_ENCAPS_LIST
+.filter{ isType(it, "AST_ENCAPS_LIST") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: string
+.filter{ isType(it, "string") }
+
+// Go up one level.
+.parents()
+
+// Traverse to child #1
+.ithChildren(1)
+
+// Node: AST_VAR
+.filter{ isType(it, "AST_VAR") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: string
+.filter{ isType(it, "string") }
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Traverse to child #2
+.ithChildren(2)
+
+// Node: string
+.filter{ isType(it, "string") }
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Traverse to child #1
+.ithChildren(1)
+
+// Node: AST_VAR
+.filter{ isType(it, "AST_VAR") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: string
+.filter{ isType(it, "string") }
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Traverse to child #1
+.ithChildren(1)
+
+// Node: string
+.filter{ isType(it, "string") }
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Traverse to child #1
+.ithChildren(1)
+
+// Node: AST_VAR
+.filter{ isType(it, "AST_VAR") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: string
+.filter{ isType(it, "string") }
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Traverse to child #1
+.ithChildren(1)
+
+// Node: string
+.filter{ isType(it, "string") }
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Traverse to child #5
+.ithChildren(5)
+
+// Node: AST_STMT_LIST
+.filter{ isType(it, "AST_STMT_LIST") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: AST_ECHO
+.filter{ isType(it, "AST_ECHO") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: string
+.filter{ isType(it, "string") }
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Traverse to child #1
+.ithChildren(1)
+
+// Node: AST_IF_ELEM
+.filter{ isType(it, "AST_IF_ELEM") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: AST_STMT_LIST
+.filter{ isType(it, "AST_STMT_LIST") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: AST_STMT_LIST
+.filter{ isType(it, "AST_STMT_LIST") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: AST_ECHO
+.filter{ isType(it, "AST_ECHO") }
+
+// Traverse to child #0
+.ithChildren(0)
+
+// Node: string
+.filter{ isType(it, "string") }
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+.parents()
+
+// Go up one level.
+
+// Prepare end of query.
+
+.sideEffect{ end_linenumber = it.lineno }
+.toFile().sideEffect{ filename = it.name }
+
+// Print all found results.
+.transform{ printFoundCC(start_linenumber, end_linenumber, filename) }

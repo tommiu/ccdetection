@@ -1,0 +1,165 @@
+def printFoundCC(line_start, line_end, file_name) {
+"Found a code clone on lines " + line_start + " to " + line_end + "\n" + "File: " + file_name
+}
+
+childnumber = 0
+
+g.V
+.sideEffect{ start_linenumber = it.lineno }
+
+// Parent #0
+.filter{ isType(it, "AST_IF") }
+.filter{ isType(it.ithChildren(0).next(), "AST_IF_ELEM") }
+.filter{ isType(it.ithChildren(0).ithChildren(0).next(), "AST_ISSET") }
+.filter{ isType(it.ithChildren(0).ithChildren(0).ithChildren(0).next(), "AST_DIM") }
+.filter{ isType(it.ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0).next(), "AST_VAR") }
+.filter{ isType(it.ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0).next(), "string") }
+.filter{ isType(it.ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(1).next(), "string") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).next(), "AST_STMT_LIST") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).next(), "AST_IF") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).next(), "AST_IF_ELEM") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(0).next(), "AST_ISSET") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0).next(), "AST_DIM") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0).next(), "AST_VAR") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0).next(), "string") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(1).next(), "string") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).next(), "AST_STMT_LIST") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).next(), "AST_IF") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).next(), "AST_IF_ELEM") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(0).next(), "AST_CALL") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0).next(), "AST_NAME") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0).next(), "string") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(1).next(), "AST_ARG_LIST") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).next(), "string") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(1).next(), "AST_DIM") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(1).ithChildren(0).next(), "AST_VAR") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(1).ithChildren(0).ithChildren(0).next(), "string") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(1).ithChildren(1).next(), "string") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).next(), "AST_STMT_LIST") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).next(), "AST_ASSIGN") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).next(), "AST_VAR") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(0).next(), "string") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(1).next(), "AST_DIM") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(1).ithChildren(0).next(), "AST_VAR") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).next(), "string") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(1).ithChildren(1).next(), "string") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(1).next(), "AST_OR") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(1).ithChildren(0).next(), "AST_ASSIGN") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(1).ithChildren(0).ithChildren(0).next(), "AST_VAR") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(0).next(), "string") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(1).ithChildren(0).ithChildren(1).next(), "AST_CALL") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(1).ithChildren(0).ithChildren(1).ithChildren(0).next(), "AST_NAME") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(1).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).next(), "string") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(1).ithChildren(0).ithChildren(1).ithChildren(1).next(), "AST_ARG_LIST") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(1).ithChildren(0).ithChildren(1).ithChildren(1).ithChildren(0).next(), "string") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(1).ithChildren(0).ithChildren(1).ithChildren(1).ithChildren(1).next(), "string") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(1).ithChildren(0).ithChildren(1).ithChildren(1).ithChildren(2).next(), "string") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(1).ithChildren(1).next(), "AST_EXIT") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(1).ithChildren(1).ithChildren(0).next(), "AST_BINARY_OP") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(1).ithChildren(1).ithChildren(0).ithChildren(0).next(), "string") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(1).ithChildren(1).ithChildren(0).ithChildren(1).next(), "AST_CALL") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(1).ithChildren(1).ithChildren(0).ithChildren(1).ithChildren(0).next(), "AST_NAME") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(1).ithChildren(1).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).next(), "string") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(1).ithChildren(1).ithChildren(0).ithChildren(1).ithChildren(1).next(), "AST_ARG_LIST") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(2).next(), "AST_ASSIGN") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(2).ithChildren(0).next(), "AST_VAR") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(2).ithChildren(0).ithChildren(0).next(), "string") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(2).ithChildren(1).next(), "AST_CALL") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(2).ithChildren(1).ithChildren(0).next(), "AST_NAME") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(2).ithChildren(1).ithChildren(0).ithChildren(0).next(), "string") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(2).ithChildren(1).ithChildren(1).next(), "AST_ARG_LIST") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(2).ithChildren(1).ithChildren(1).ithChildren(0).next(), "string") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(3).next(), "AST_ASSIGN") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(3).ithChildren(0).next(), "AST_VAR") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(3).ithChildren(0).ithChildren(0).next(), "string") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(3).ithChildren(1).next(), "AST_BINARY_OP") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(3).ithChildren(1).ithChildren(0).next(), "AST_BINARY_OP") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(3).ithChildren(1).ithChildren(0).ithChildren(0).next(), "AST_BINARY_OP") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(3).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(0).next(), "AST_BINARY_OP") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(3).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0).next(), "string") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(3).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(1).next(), "AST_VAR") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(3).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).next(), "string") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(3).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).next(), "string") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(3).ithChildren(1).ithChildren(0).ithChildren(1).next(), "AST_VAR") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(3).ithChildren(1).ithChildren(0).ithChildren(1).ithChildren(0).next(), "string") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(3).ithChildren(1).ithChildren(1).next(), "string") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(4).next(), "AST_ASSIGN") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(4).ithChildren(0).next(), "AST_VAR") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(4).ithChildren(0).ithChildren(0).next(), "string") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(4).ithChildren(1).next(), "AST_CALL") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(4).ithChildren(1).ithChildren(0).next(), "AST_NAME") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(4).ithChildren(1).ithChildren(0).ithChildren(0).next(), "string") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(4).ithChildren(1).ithChildren(1).next(), "AST_ARG_LIST") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(4).ithChildren(1).ithChildren(1).ithChildren(0).next(), "AST_VAR") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(4).ithChildren(1).ithChildren(1).ithChildren(0).ithChildren(0).next(), "string") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(5).next(), "AST_WHILE") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(5).ithChildren(0).next(), "AST_ASSIGN") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(5).ithChildren(0).ithChildren(0).next(), "AST_VAR") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(5).ithChildren(0).ithChildren(0).ithChildren(0).next(), "string") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(5).ithChildren(0).ithChildren(1).next(), "AST_CALL") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(5).ithChildren(0).ithChildren(1).ithChildren(0).next(), "AST_NAME") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(5).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).next(), "string") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(5).ithChildren(0).ithChildren(1).ithChildren(1).next(), "AST_ARG_LIST") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(5).ithChildren(0).ithChildren(1).ithChildren(1).ithChildren(0).next(), "AST_VAR") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(5).ithChildren(0).ithChildren(1).ithChildren(1).ithChildren(0).ithChildren(0).next(), "string") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(5).ithChildren(1).next(), "AST_STMT_LIST") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(5).ithChildren(1).ithChildren(0).next(), "AST_ASSIGN") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(5).ithChildren(1).ithChildren(0).ithChildren(0).next(), "AST_VAR") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(5).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(0).next(), "string") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(5).ithChildren(1).ithChildren(0).ithChildren(1).next(), "AST_DIM") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(5).ithChildren(1).ithChildren(0).ithChildren(1).ithChildren(0).next(), "AST_VAR") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(5).ithChildren(1).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).next(), "string") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(5).ithChildren(1).ithChildren(0).ithChildren(1).ithChildren(1).next(), "string") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(5).ithChildren(1).ithChildren(1).next(), "AST_ASSIGN") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(5).ithChildren(1).ithChildren(1).ithChildren(0).next(), "AST_VAR") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(5).ithChildren(1).ithChildren(1).ithChildren(0).ithChildren(0).next(), "string") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(5).ithChildren(1).ithChildren(1).ithChildren(1).next(), "AST_DIM") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(5).ithChildren(1).ithChildren(1).ithChildren(1).ithChildren(0).next(), "AST_VAR") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(5).ithChildren(1).ithChildren(1).ithChildren(1).ithChildren(0).ithChildren(0).next(), "string") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(5).ithChildren(1).ithChildren(1).ithChildren(1).ithChildren(1).next(), "string") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(5).ithChildren(1).ithChildren(2).next(), "AST_ASSIGN") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(5).ithChildren(1).ithChildren(2).ithChildren(0).next(), "AST_VAR") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(5).ithChildren(1).ithChildren(2).ithChildren(0).ithChildren(0).next(), "string") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(5).ithChildren(1).ithChildren(2).ithChildren(1).next(), "AST_DIM") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(5).ithChildren(1).ithChildren(2).ithChildren(1).ithChildren(0).next(), "AST_VAR") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(5).ithChildren(1).ithChildren(2).ithChildren(1).ithChildren(0).ithChildren(0).next(), "string") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(5).ithChildren(1).ithChildren(2).ithChildren(1).ithChildren(1).next(), "string") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(5).ithChildren(1).ithChildren(3).next(), "AST_STMT_LIST") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(5).ithChildren(1).ithChildren(3).ithChildren(0).next(), "AST_ECHO") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(5).ithChildren(1).ithChildren(3).ithChildren(0).ithChildren(0).next(), "string") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(5).ithChildren(1).ithChildren(4).next(), "AST_STMT_LIST") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(5).ithChildren(1).ithChildren(4).ithChildren(0).next(), "AST_ECHO") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(5).ithChildren(1).ithChildren(4).ithChildren(0).ithChildren(0).next(), "AST_BINARY_OP") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(5).ithChildren(1).ithChildren(4).ithChildren(0).ithChildren(0).ithChildren(0).next(), "AST_BINARY_OP") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(5).ithChildren(1).ithChildren(4).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0).next(), "AST_BINARY_OP") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(5).ithChildren(1).ithChildren(4).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0).next(), "AST_BINARY_OP") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(5).ithChildren(1).ithChildren(4).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0).next(), "AST_BINARY_OP") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(5).ithChildren(1).ithChildren(4).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0).next(), "string") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(5).ithChildren(1).ithChildren(4).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(1).next(), "AST_ENCAPS_LIST") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(5).ithChildren(1).ithChildren(4).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).next(), "string") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(5).ithChildren(1).ithChildren(4).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(1).next(), "AST_VAR") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(5).ithChildren(1).ithChildren(4).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(1).ithChildren(0).next(), "string") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(5).ithChildren(1).ithChildren(4).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(2).next(), "string") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(5).ithChildren(1).ithChildren(4).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(1).next(), "AST_VAR") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(5).ithChildren(1).ithChildren(4).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).next(), "string") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(5).ithChildren(1).ithChildren(4).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(1).next(), "string") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(5).ithChildren(1).ithChildren(4).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(1).next(), "AST_VAR") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(5).ithChildren(1).ithChildren(4).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).next(), "string") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(5).ithChildren(1).ithChildren(4).ithChildren(0).ithChildren(0).ithChildren(1).next(), "string") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(5).ithChildren(1).ithChildren(5).next(), "AST_STMT_LIST") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(5).ithChildren(1).ithChildren(5).ithChildren(0).next(), "AST_ECHO") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(5).ithChildren(1).ithChildren(5).ithChildren(0).ithChildren(0).next(), "string") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(1).next(), "AST_IF_ELEM") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(1).ithChildren(0).next(), "NULL") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(1).ithChildren(1).next(), "AST_STMT_LIST") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(1).ithChildren(1).ithChildren(0).next(), "AST_STMT_LIST") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(1).ithChildren(1).ithChildren(0).ithChildren(0).next(), "AST_ECHO") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(1).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(0).next(), "string") }
+
+// Prepare end of query.
+
+.sideEffect{ end_linenumber = it.lineno }
+.toFile().sideEffect{ filename = it.name }
+
+// Print all found results.
+.transform{ printFoundCC(start_linenumber, end_linenumber, filename) }

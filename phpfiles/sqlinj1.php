@@ -10,4 +10,3 @@ $query="SELECT * FROM social_clubs
 
 // var2 .= list containing string, var1 (in this order)
 $query.= "AND WHERE alcohol_permitted = $user_alcohol_permitted_selection";
-?>

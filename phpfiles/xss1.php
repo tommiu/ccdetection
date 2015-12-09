@@ -1,7 +1,7 @@
 <?php
 //http://www.webreference.com/programming/php/search/2.html
 //-----------------------------
-  if(isset($_POST['submit'])){
+if(isset($_POST['submit'])){
   if(isset($_GET['go'])){
   if(preg_match("/^[  a-zA-Z]+/", $_POST['name'])){
   $name=$_POST['name'];
@@ -28,5 +28,5 @@
   echo  "<p>Please enter a search query</p>";
   }
   }
-  }
+}
 ?>

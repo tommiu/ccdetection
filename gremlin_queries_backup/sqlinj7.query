@@ -1,0 +1,120 @@
+def printFoundCC(line_start, line_end, file_name) {
+"Found a code clone on lines " + line_start + " to " + line_end + "\n" + "File: " + file_name
+}
+
+childnumber = 0
+
+// Initialize variables of query
+result = ""
+sql = ""
+
+// Start query.
+g.V
+.sideEffect{ start_linenumber = it.lineno }
+
+// Parent #0
+.filter{ isType(it, "AST_ASSIGN") }
+.filter{ isType(it.ithChildren(0).next(), "AST_VAR") }
+
+// Remember variable sql
+.sideEffect{ sql = it.ithChildren(0).varToName().next() }
+.filter{ isType(it.ithChildren(0).ithChildren(0).next(), "string") }
+.filter{ isType(it.ithChildren(1).next(), "AST_ENCAPS_LIST") }
+.filter{ isType(it.ithChildren(1).ithChildren(0).next(), "string") }
+.filter{ isType(it.ithChildren(1).ithChildren(1).next(), "AST_DIM") }
+.filter{ isType(it.ithChildren(1).ithChildren(1).ithChildren(0).next(), "AST_VAR") }
+.filter{ isType(it.ithChildren(1).ithChildren(1).ithChildren(0).ithChildren(0).next(), "string") }
+.filter{ isType(it.ithChildren(1).ithChildren(1).ithChildren(1).next(), "string") }
+.filter{ isType(it.ithChildren(1).ithChildren(2).next(), "string") }
+.sideEffect{ childnumber = it.childnum }
+.sideEffect{ childnumber = childnumber + 1 }
+
+// Go up one level.
+.parents()
+.children()
+
+// Check next AST-node (similar to next line of code)
+.filter{ it.childnum == childnumber }
+
+// Parent #1
+.filter{ isType(it, "AST_ASSIGN") }
+.filter{ isType(it.ithChildren(0).next(), "AST_VAR") }
+
+// Remember variable result
+.sideEffect{ result = it.ithChildren(0).varToName().next() }
+.filter{ isType(it.ithChildren(0).ithChildren(0).next(), "string") }
+.filter{ isType(it.ithChildren(1).next(), "AST_CALL") }
+.filter{ isType(it.ithChildren(1).ithChildren(0).next(), "AST_NAME") }
+.filter{ isType(it.ithChildren(1).ithChildren(0).ithChildren(0).next(), "string") }
+.filter{ isType(it.ithChildren(1).ithChildren(1).next(), "AST_ARG_LIST") }
+.filter{ isType(it.ithChildren(1).ithChildren(1).ithChildren(0).next(), "AST_VAR") }
+.filter{ it.ithChildren(1).ithChildren(1).ithChildren(0).varToName().next() == sql }
+.filter{ isType(it.ithChildren(1).ithChildren(1).ithChildren(0).ithChildren(0).next(), "string") }
+.sideEffect{ childnumber = it.childnum }
+.sideEffect{ childnumber = childnumber + 1 }
+
+// Go up one level.
+.parents()
+.children()
+
+// Check next AST-node (similar to next line of code)
+.filter{ it.childnum == childnumber }
+
+// Parent #2
+.filter{ isType(it, "AST_IF") }
+.filter{ isType(it.ithChildren(0).next(), "AST_IF_ELEM") }
+.filter{ isType(it.ithChildren(0).ithChildren(0).next(), "AST_UNARY_OP") }
+.filter{ isType(it.ithChildren(0).ithChildren(0).ithChildren(0).next(), "AST_VAR") }
+.filter{ it.ithChildren(0).ithChildren(0).ithChildren(0).varToName().next() == result }
+.filter{ isType(it.ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0).next(), "string") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).next(), "AST_STMT_LIST") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).next(), "AST_CALL") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).next(), "AST_NAME") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(0).next(), "string") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(1).next(), "AST_ARG_LIST") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(1).ithChildren(0).next(), "AST_BINARY_OP") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).next(), "AST_BINARY_OP") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(0).next(), "string") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).next(), "string") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(1).next(), "string") }
+.sideEffect{ childnumber = it.childnum }
+.sideEffect{ childnumber = childnumber + 1 }
+
+// Go up one level.
+.parents()
+.children()
+
+// Check next AST-node (similar to next line of code)
+.filter{ it.childnum == childnumber }
+
+// Parent #3
+.filter{ isType(it, "AST_IF") }
+.filter{ isType(it.ithChildren(0).next(), "AST_IF_ELEM") }
+.filter{ isType(it.ithChildren(0).ithChildren(0).next(), "AST_GREATER") }
+.filter{ isType(it.ithChildren(0).ithChildren(0).ithChildren(0).next(), "AST_SILENCE") }
+.filter{ isType(it.ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0).next(), "AST_CALL") }
+.filter{ isType(it.ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0).next(), "AST_NAME") }
+.filter{ isType(it.ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0).next(), "string") }
+.filter{ isType(it.ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(1).next(), "AST_ARG_LIST") }
+.filter{ isType(it.ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).next(), "AST_VAR") }
+.filter{ it.ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).varToName().next() == result }
+.filter{ isType(it.ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).next(), "string") }
+.filter{ isType(it.ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(1).next(), "integer") }
+.filter{ isType(it.ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(2).next(), "integer") }
+.filter{ isType(it.ithChildren(0).ithChildren(0).ithChildren(1).next(), "integer") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).next(), "AST_STMT_LIST") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).next(), "AST_CALL") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).next(), "AST_NAME") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(0).next(), "string") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(1).next(), "AST_ARG_LIST") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(1).ithChildren(0).next(), "AST_BINARY_OP") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).next(), "string") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(1).next(), "string") }
+
+// Prepare end of query.
+
+.sideEffect{ end_linenumber = it.lineno }
+.toFile().sideEffect{ filename = it.name }
+
+// Print all found results.
+.transform{ printFoundCC(start_linenumber, end_linenumber, filename) }
