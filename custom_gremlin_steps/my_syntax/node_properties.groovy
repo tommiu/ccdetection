@@ -19,6 +19,7 @@ Gremlin.defineStep('hasFlag', [Vertex, Pipe], { p ->
             }
 })
 
-Object.metaClass.isIfNode = { it -> 
-    it.type == TYPE_IF
+// Generalized node type query.
+Object.metaClass.isType = { it, type ->
+    it.filter{ it.getProperty("type") == type }.count() == 1
 }
