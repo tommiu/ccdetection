@@ -22,32 +22,66 @@ class Neo4jHelper(object):
         '''
     
     @staticmethod
+    def setStatisticsObj(obj):
+        Neo4jHelper.stats = obj
+    
+    @staticmethod
     def analyseData(code_and_path_and_process_number):
         """
         Create the PHP AST of the files in 'path', import them into the 
         neo4j graph database and start the neo4j console.
         Finally, run the analysing query against the graph database. 
         """
-        code, path, process_number = code_and_path_and_process_number
-        
+        query_objects, path, process_number = code_and_path_and_process_number
         port = 7473 + process_number
+        
         try:
             process = Neo4jHelper.prepareData(path, process_number)
             cc_tester = ManualCCSearch(port)
-            cc_tester.runTimedQuery(cc_tester.runQuery, query=code)
+            
+            first_query = True
+            for query_file_obj in query_objects:
+                result, elapsed_time = cc_tester.runTimedQuery(
+                                        cc_tester.runQuery,
+                                        query=query_file_obj.getCode()
+                                        )
+                if hasattr(Neo4jHelper, "stats"):
+                    # Statistics are enabled, so add results to the statistics.
+                    if result:
+                        # Code clones found.
+                        for clone in result:
+                            Neo4jHelper.stats.addFoundCodeClone(
+                                                    clone, first=first_query
+                                                    )
+                    
+                    else:
+                        # No code clone found.
+                        Neo4jHelper.stats.addQuery(
+                                                elapsed_time, first=first_query
+                                                )
+                        
+                    first_query = False
 
+            if hasattr(Neo4jHelper, "stats"):
+                Neo4jHelper.stats.incProjectsCounter()
+                try:
+                    Neo4jHelper.stats.saveData()
+                
+                except:
+                    pass
+            
             # Kill neo4j database server.
             process.sendcontrol('c')
             process.close()
     
-        except BindException as err:
+        except BindException:
             print (
                 "Port %d is taken. Trying to kill a neo4j graph database "
                 "listening on that port and start an updated one." % port
                 )
             
             Neo4jHelper.killProcess(process_number)
-            Neo4jHelper.analyseData(code_and_path_and_process_number)
+            return Neo4jHelper.analyseData(code_and_path_and_process_number)
         
         return process_number
     
@@ -76,6 +110,7 @@ class Neo4jHelper(object):
                             ])
     
         if expectation == 2:
+            # BindException (port already taken?)
             raise BindException()
         
         elif expectation == 3:
@@ -84,7 +119,7 @@ class Neo4jHelper(object):
 
         return process
     
-    def startConsole(self, path):
+    def startConsole(self, path, port=1):
         """
         Import the php file/project AST from 'path' into the neo4j 
         database and start the neo4j console, using the 'SPAWN_SCRIPT' file.
@@ -94,7 +129,7 @@ class Neo4jHelper(object):
                             [
                     Configurator.getPath(Configurator.KEY_SPAWN_SCRIPT),
                     Configurator.getPath(Configurator.KEY_BASE_DIR) + "/config", 
-                    path, "1",
+                    path, str(port),
                     Configurator.getPath(Configurator.KEY_PHP_PARSE_RESULTS)
                     ],
                             preexec_fn=os.setsid
