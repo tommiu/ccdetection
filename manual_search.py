@@ -7,6 +7,7 @@ Created on Oct 27, 2015
 from joern.all import JoernSteps
 import time
 from configurator import Configurator
+from results.code_clone_data import CodeCloneData
 
 class ManualCCSearch(object):
     '''
@@ -30,10 +31,10 @@ class ManualCCSearch(object):
         '''
         self.j = JoernSteps()
         self.j.setGraphDbURL('http://localhost:%d/db/data/' % (int(port)))
-        self.j.addStepsDir(
-                        Configurator.getPath(Configurator.KEY_PYTHON_JOERN) + 
-                        "/joern/phpjoernsteps"
-                        )
+#         self.j.addStepsDir(
+#                         Configurator.getPath(Configurator.KEY_PYTHON_JOERN) + 
+#                         "/joern/phpjoernsteps"
+#                         )
         
         self.j.addStepsDir(
                         Configurator.getPath(Configurator.KEY_BASE_DIR) +
@@ -94,18 +95,35 @@ class ManualCCSearch(object):
     def runTimedQuery(self, myFunction, query=None):
         start = time.time()
         res = None
+        try:
+            if query:
+                res = self.j.runGremlinQuery(myFunction(query))
+            else:
+                res = self.j.runGremlinQuery(myFunction())
+
+        except Exception as err:
+            print "Caught exception:", type(err), err
         
-        if query:
-            res = self.j.runGremlinQuery(myFunction(query))
-        else:
-            res = self.j.runGremlinQuery(myFunction())
         elapsed = time.time() - start
         
-        print "Query done in %f seconds." % (elapsed)
+#         print "Query done in %f seconds." % (elapsed)
+        result = []
         try:
             for node in res:
                 print node
+                data = CodeCloneData()
+                data.stripDataFromOutput(node)
+                data.setQueryTime(elapsed)
+                result.append(data)
 
         except TypeError:
-            # res is not iterable, because it is one node only.
-            print res
+            # res is not iterable, because it is one/no node.
+#             print res
+            if res:
+                data = CodeCloneData()
+                data.stripDataFromOutput(node)
+                data.setQueryTime(elapsed)
+                result.append(data)
+                print res
+        
+        return (result, elapsed)
