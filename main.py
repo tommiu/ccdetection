@@ -14,13 +14,20 @@ from LazyMP import LazyMP
 from LazyMP import ProcessIdGenerator
 from neo4j_helper import Neo4jHelper
 from configurator import Configurator
+from query_file import QueryFile
+from results.shared_data import SharedData
+import multiprocessing
+from multiprocessing import Value
 
 ARGS_HELP    = "help"
 ARGS_SEARCH  = "search"
 ARGS_CONFIG  = "config"
 ARGS_CONSOLE = "console"
+ARGS_PRINT_STATS = "print_stats"
+ARGS_CONTINUOUS_SEARCH = "continuous_search"
 
-CONFIG_PATH  = "config"
+CONFIG_PATH = "config"
+DEFAULT_STATS_PATH  = "stats"
 
 def main(argv):
     # Setup command line arguments.
@@ -60,37 +67,102 @@ def main(argv):
         sys.exit()
     
     elif flow[parser.KEY_MODE] == ARGS_CONSOLE:
-        Neo4jHelper().startConsole(os.path.abspath(flow["in"]))
+        id = 1
+        try:
+            id = getArg(flow, "id")
+        
+        except:
+            pass
+        
+        Neo4jHelper().startConsole(os.path.abspath(flow["in"]), str(id))
     
     elif flow[parser.KEY_MODE] == ARGS_SEARCH:
         startSearchMode(flow)
+        
+    elif flow[parser.KEY_MODE] == ARGS_CONTINUOUS_SEARCH:
+        startSearchMode(flow, continuous=True)
         
     elif flow[parser.KEY_MODE] == ARGS_CONFIG:
         Configurator().setupConfig(
                                 CONFIG_PATH, base_dir, getArg(flow, "p", "path")
                                 )
+    
+    elif flow[parser.KEY_MODE] == ARGS_PRINT_STATS:
+        printStats(flow)
 
     else:
         parser.printHelp(argv[0])
         sys.exit()
-
-def startSearchMode(flow):
+        
+def printStats(flow):
+    try:
+        stats_path = getArg(flow, 's', 'statsfile')
+    except:
+        stats_path = DEFAULT_STATS_PATH
+    
+    if os.path.isfile(stats_path):
+        print "Statistics file: '%s'" % (stats_path)
+        print SharedData(stats_path)
+    else:
+        print "Given path is not a valid file: '%s'" % (stats_path)
+        
+def startSearchMode(flow, continuous=False):
     flow["in"] = os.path.abspath(flow["in"])
-    code = ""
+    if not os.path.exists(flow["in"]):
+        print "Given path (-in) does not exist."
+        sys.exit()
+    
     level = 0
     multithreads = 0
     neo4j_helper = Neo4jHelper()
     
+    if continuous:
+        # Continuous mode was specified, so read the config file
+        try:
+            stats_path = getArg(flow, "s", "statsfile")
+        except:
+            stats_path = DEFAULT_STATS_PATH
+
+        shared_data = SharedData(stats_path)
+        
+        Neo4jHelper.setStatisticsObj(shared_data)
+
     try:
         multithreads = int(getArg(flow, "m", "multithreading"))
     except:
         pass
     
-    code_path = getArg(flow, "c", "code")
+    code_path = getArg(flow, "q", "queries")
+    code = []
     
-    # Read given code.
-    with open(code_path, "r") as fh:
-        code = fh.read()
+    # Read given query.
+    if os.path.isfile(code_path):
+        with open(code_path, "r") as fh:
+            code.append(
+                    QueryFile(code_path, fh.read())
+                    )
+    
+    elif os.path.isdir(code_path):
+        # Given path is a directory - get all files recursively inside the
+        # directory.
+        for path, _, files in os.walk(code_path):
+            for name in files:
+                file_path = os.path.join(path, name)
+                with open(file_path, "r") as fh:
+                    code.append(
+                            QueryFile(file_path, fh.read())
+                            )
+        
+        if not code:
+            # Did not find any file recursively inside 'code_path'.
+            print "Query-path (-q/--queries) does not contain any files."
+            sys.exit()
+                    
+    else:
+        # Path does not exist
+        print "Query-Path (-q/--queries) does not exist."
+        sys.exit()
+    
     
     try:
         level = int(getArg(flow, "l", "level"))
@@ -100,8 +172,9 @@ def startSearchMode(flow):
         pass
     
     if level == 0:
-        # Analyse specified file/files in specified directory.
-        neo4j_helper.analyseData((
+        # Analyse specified file/files in specified directory with given
+        # gremlin query/queries.
+        Neo4jHelper.analyseData((
                 code, flow["in"], 1
                 ))
     
@@ -110,7 +183,7 @@ def startSearchMode(flow):
         try:
             # Get the root directory of every project in a generator.
             path_generator = getRootDirectories(flow["in"], level)
-            
+
         except Exception as err:
             print "An exception occured: %s" % err
             sys.exit()
@@ -203,10 +276,11 @@ def traversePath(destination_list, path, current_level, target_level):
                 
             else:
                 # Traverse directory deeper.
-                traversePath(
+                for path in traversePath(
                         destination_list, _path, 
                         current_level + 1, target_level
-                        )
+                        ):
+                    yield path
 
 def setupArgs(parser):
     """
@@ -216,10 +290,10 @@ def setupArgs(parser):
     explanation = "Print this help."
     parser.addArgumentsCombination(ARGS_HELP, explanation=explanation)
     
-    # Search code clones: search -c file -in dir/file (-r)
+    # Search code clones: search -q file -in dir/file
     explanation = (
                 "Search clones of the code snippet in file specified with "
-                "-c/--code in directory or file specified with -in. In the "
+                "-q/--queries in directory or file specified with -in. In the "
                 "case of a dictionary full of project dictionaries, "
                 "you can analyse each project on its own by "
                 "specifying -l/--level 1. Level==1 means, that "
@@ -230,7 +304,7 @@ def setupArgs(parser):
     parser.addArgumentsCombination(
                                 ARGS_SEARCH,
                                 [
-                            ["c=", "code"],
+                            ["q=", "queries"],
                             ["in=", None]
                             ],
                                 [
@@ -241,11 +315,47 @@ def setupArgs(parser):
                                 explanation=explanation
                                 )
     
-    # Open neo4j console: console -in dir/file
+    # Search code clones: continuous_search -q file -in paths_file (-s file)
+    explanation = (
+                "Extension of the search mode: Additionally to searching "
+                "code clones, a file is used to record statistical data "
+                "across multiple executions of the continuous_search. "
+                "The default path for the stats file is './stats', but it "
+                "can be modified using the -s/--statsfile parameter."
+                )
+    parser.addArgumentsCombination(
+                                ARGS_CONTINUOUS_SEARCH,
+                                [
+                            ["q=", "queries"],
+                            ["in=", None]
+                            ],
+                                [
+                            ["l=", "level"],
+                            ["m=", "multithreading"],
+                            ["d", "debug"],
+                            ["s=", "statsfile"]
+                            ],
+                                explanation=explanation
+                                )
+    
+    # Print statistical data: print_stats (-s file)
+    explanation = (
+                "Print out the statistical data, that has been collected "
+                "by using the continuous_search mode before."
+                )
+    parser.addArgumentsCombination(
+                                ARGS_PRINT_STATS,
+                                [],
+                                [["s=", "statsfile"]],
+                                explanation=explanation
+                                )
+    
+    # Open neo4j console: config -p/--path dir/file
     explanation = (
                 "Setup the config file using the specified path in '-p/--path'."
                 " The config file contains all the necessary paths for "
                 "ccdetection to work correctly."
+                "Use \"-id integer\" to use another neo4j database instance."
                 )
     parser.addArgumentsCombination(
                                 ARGS_CONFIG,
@@ -261,6 +371,7 @@ def setupArgs(parser):
     parser.addArgumentsCombination(
                                 ARGS_CONSOLE,
                                 [["in=", None]],
+                                [["id=", None]],
                                 explanation=explanation
                                 )
 
