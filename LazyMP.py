@@ -106,7 +106,7 @@ class ProcessIdGenerator(object):
         pass
     
     def getGenerator(self, ids):
-        self.waiting_ids = mp.Queue(4)
+        self.waiting_ids = mp.Queue(len(ids))
         for _id in ids:
             self.waiting_ids.put(int(_id))
             

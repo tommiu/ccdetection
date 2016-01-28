@@ -40,6 +40,9 @@ class Neo4jHelper(object):
             cc_tester = ManualCCSearch(port)
             
             first_query = True
+            clones = []
+            queries = []
+            
             for query_file_obj in query_objects:
                 result, elapsed_time = cc_tester.runTimedQuery(
                                         cc_tester.runQuery,
@@ -50,23 +53,32 @@ class Neo4jHelper(object):
                     if result:
                         # Code clones found.
                         for clone in result:
-                            Neo4jHelper.stats.addFoundCodeClone(
-                                                    clone, first=first_query
-                                                    )
+                            clone.setQueryFile(query_file_obj.getFilename())
+                            code_clone = {
+                                        "clone": clone,
+                                        "first": first_query
+                                        }
+                            clones.append(code_clone)
+#                             Neo4jHelper.stats.addFoundCodeClone(
+#                                                     clone, first=first_query
+#                                                     )
                     
                     else:
                         # No code clone found.
-                        Neo4jHelper.stats.addQuery(
-                                                elapsed_time, first=first_query
-                                                )
+                        query = {
+                            "query_time": elapsed_time,
+                            "first": first_query
+                            }
+                        queries.append(query)
+#                         Neo4jHelper.stats.addQuery(
+#                                                 elapsed_time, first=first_query
+#                                                 )
                         
                     first_query = False
 
             if hasattr(Neo4jHelper, "stats"):
-                Neo4jHelper.stats.incProjectsCounter()
                 try:
-                    Neo4jHelper.stats.saveData()
-                
+                    Neo4jHelper.stats.saveData(queries, clones)
                 except:
                     pass
             
@@ -83,6 +95,14 @@ class Neo4jHelper(object):
             Neo4jHelper.killProcess(process_number)
             return Neo4jHelper.analyseData(code_and_path_and_process_number)
         
+        except PathException:
+            exception = "Could not create directory in ccdetection/graphs/."
+            print exception
+            return Neo4jHelper.analyseData(code_and_path_and_process_number)
+            
+#             raise Exception(exception)
+            
+        
         return process_number
     
     @staticmethod
@@ -96,25 +116,31 @@ class Neo4jHelper(object):
                     path, str(process_number),
                     Configurator.getPath(Configurator.KEY_PHP_PARSE_RESULTS) 
                     ],
-                            360
+                            None
                             )
         
         if Configurator.isDebuggingEnabled():
             process.logfile = sys.stdout
         
         expectation = process.expect([
-                            "graph.db still exists", 
-                            "Remote interface ready", 
-                            "java.net.BindException",
-                            pexpect.EOF
-                            ])
-    
+#                         "graph.db still exists", 
+                        "Remote interface ready", 
+                        "java.net.BindException",
+                        "java.io.IOException: Unable to create directory path",
+                        pexpect.EOF
+                        ])
+        
         if expectation == 2:
             # BindException (port already taken?)
             raise BindException()
         
         elif expectation == 3:
+            # Unable to create directory path
+            raise PathException()
+       
+        elif expectation == 4:
             # EOF
+            # print process.before
             raise BindException()
 
         return process
@@ -162,3 +188,6 @@ class BindException(BaseException):
             
     def __str__(self):
         return self.message
+
+class PathException(Exception):
+    pass

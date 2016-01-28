@@ -1,0 +1,201 @@
+childnumber = 0
+
+// Initialize variables of query
+_FirstName = ""
+_LastName = ""
+_db = ""
+_contactid = ""
+_PhoneNumber = ""
+_result = ""
+_sql = ""
+_mydb = ""
+_Email = ""
+_row = ""
+
+// Start query.
+g.V
+.sideEffect{ start_linenumber = it.lineno }
+
+// Parent #0
+.filter{ isType(it, "AST_ASSIGN") }
+.filter{ isType(it.ithChildren(0), "AST_VAR") }
+
+// Remember variable contactid
+.sideEffect{ _contactid = it.ithChildren(0).varToName().next() }
+.filter{ isType(it.ithChildren(1), "AST_DIM") }
+.filter{ isType(it.ithChildren(1).ithChildren(0), "AST_VAR") }
+.sideEffect{ childnumber = it.childnum }
+.sideEffect{ childnumber = childnumber + 1 }
+
+// Go up one level.
+.parents()
+.children()
+
+// Check next AST-node (similar to next line of code)
+.filter{ it.childnum == childnumber }
+
+// Parent #1
+.filter{ isType(it, "AST_OR") }
+.filter{ isType(it.ithChildren(0), "AST_ASSIGN") }
+.filter{ isType(it.ithChildren(0).ithChildren(0), "AST_VAR") }
+
+// Remember variable db
+.sideEffect{ _db = it.ithChildren(0).ithChildren(0).varToName().next() }
+.filter{ isType(it.ithChildren(0).ithChildren(1), "AST_CALL") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0), "AST_NAME") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(1), "AST_ARG_LIST") }
+.filter{ isType(it.ithChildren(1), "AST_EXIT") }
+.filter{ isType(it.ithChildren(1).ithChildren(0), "AST_BINARY_OP") }
+.filter{ isType(it.ithChildren(1).ithChildren(0).ithChildren(1), "AST_CALL") }
+.filter{ isType(it.ithChildren(1).ithChildren(0).ithChildren(1).ithChildren(0), "AST_NAME") }
+.filter{ isType(it.ithChildren(1).ithChildren(0).ithChildren(1).ithChildren(1), "AST_ARG_LIST") }
+.sideEffect{ childnumber = it.childnum }
+.sideEffect{ childnumber = childnumber + 1 }
+
+// Go up one level.
+.parents()
+.children()
+
+// Check next AST-node (similar to next line of code)
+.filter{ it.childnum == childnumber }
+
+// Parent #2
+.filter{ isType(it, "AST_ASSIGN") }
+.filter{ isType(it.ithChildren(0), "AST_VAR") }
+
+// Remember variable mydb
+.sideEffect{ _mydb = it.ithChildren(0).varToName().next() }
+.filter{ isType(it.ithChildren(1), "AST_CALL") }
+.filter{ isType(it.ithChildren(1).ithChildren(0), "AST_NAME") }
+.filter{ isType(it.ithChildren(1).ithChildren(1), "AST_ARG_LIST") }
+.sideEffect{ childnumber = it.childnum }
+.sideEffect{ childnumber = childnumber + 1 }
+
+// Go up one level.
+.parents()
+.children()
+
+// Check next AST-node (similar to next line of code)
+.filter{ it.childnum == childnumber }
+
+// Parent #3
+.filter{ isType(it, "AST_ASSIGN") }
+.filter{ isType(it.ithChildren(0), "AST_VAR") }
+
+// Remember variable sql
+.sideEffect{ _sql = it.ithChildren(0).varToName().next() }
+.filter{ isType(it.ithChildren(1), "AST_BINARY_OP") }
+.filter{ isType(it.ithChildren(1).ithChildren(1), "AST_VAR") }
+.filter{ it.ithChildren(1).ithChildren(1).varToName().next() == _contactid }
+.sideEffect{ childnumber = it.childnum }
+.sideEffect{ childnumber = childnumber + 1 }
+
+// Go up one level.
+.parents()
+.children()
+
+// Check next AST-node (similar to next line of code)
+.filter{ it.childnum == childnumber }
+
+// Parent #4
+.filter{ isType(it, "AST_ASSIGN") }
+.filter{ isType(it.ithChildren(0), "AST_VAR") }
+
+// Remember variable result
+.sideEffect{ _result = it.ithChildren(0).varToName().next() }
+.filter{ isType(it.ithChildren(1), "AST_CALL") }
+.filter{ isType(it.ithChildren(1).ithChildren(0), "AST_NAME") }
+.filter{ isType(it.ithChildren(1).ithChildren(1), "AST_ARG_LIST") }
+.filter{ isType(it.ithChildren(1).ithChildren(1).ithChildren(0), "AST_VAR") }
+.filter{ it.ithChildren(1).ithChildren(1).ithChildren(0).varToName().next() == _sql }
+.sideEffect{ childnumber = it.childnum }
+.sideEffect{ childnumber = childnumber + 1 }
+
+// Go up one level.
+.parents()
+.children()
+
+// Check next AST-node (similar to next line of code)
+.filter{ it.childnum == childnumber }
+
+// Parent #5
+.filter{ isType(it, "AST_WHILE") }
+.filter{ isType(it.ithChildren(0), "AST_ASSIGN") }
+.filter{ isType(it.ithChildren(0).ithChildren(0), "AST_VAR") }
+
+// Remember variable row
+.sideEffect{ _row = it.ithChildren(0).ithChildren(0).varToName().next() }
+.filter{ isType(it.ithChildren(0).ithChildren(1), "AST_CALL") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0), "AST_NAME") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(1), "AST_ARG_LIST") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(1).ithChildren(0), "AST_VAR") }
+.filter{ it.ithChildren(0).ithChildren(1).ithChildren(1).ithChildren(0).varToName().next() == _result }
+.filter{ isType(it.ithChildren(1), "AST_STMT_LIST") }
+.filter{ isType(it.ithChildren(1).ithChildren(0), "AST_ASSIGN") }
+.filter{ isType(it.ithChildren(1).ithChildren(0).ithChildren(0), "AST_VAR") }
+
+// Remember variable FirstName
+.sideEffect{ _FirstName = it.ithChildren(1).ithChildren(0).ithChildren(0).varToName().next() }
+.filter{ isType(it.ithChildren(1).ithChildren(0).ithChildren(1), "AST_DIM") }
+.filter{ isType(it.ithChildren(1).ithChildren(0).ithChildren(1).ithChildren(0), "AST_VAR") }
+.filter{ isType(it.ithChildren(1).ithChildren(1), "AST_ASSIGN") }
+.filter{ isType(it.ithChildren(1).ithChildren(1).ithChildren(0), "AST_VAR") }
+
+// Remember variable LastName
+.sideEffect{ _LastName = it.ithChildren(1).ithChildren(1).ithChildren(0).varToName().next() }
+.filter{ isType(it.ithChildren(1).ithChildren(1).ithChildren(1), "AST_DIM") }
+.filter{ isType(it.ithChildren(1).ithChildren(1).ithChildren(1).ithChildren(0), "AST_VAR") }
+.filter{ isType(it.ithChildren(1).ithChildren(2), "AST_ASSIGN") }
+.filter{ isType(it.ithChildren(1).ithChildren(2).ithChildren(0), "AST_VAR") }
+
+// Remember variable PhoneNumber
+.sideEffect{ _PhoneNumber = it.ithChildren(1).ithChildren(2).ithChildren(0).varToName().next() }
+.filter{ isType(it.ithChildren(1).ithChildren(2).ithChildren(1), "AST_DIM") }
+.filter{ isType(it.ithChildren(1).ithChildren(2).ithChildren(1).ithChildren(0), "AST_VAR") }
+.filter{ isType(it.ithChildren(1).ithChildren(3), "AST_ASSIGN") }
+.filter{ isType(it.ithChildren(1).ithChildren(3).ithChildren(0), "AST_VAR") }
+
+// Remember variable Email
+.sideEffect{ _Email = it.ithChildren(1).ithChildren(3).ithChildren(0).varToName().next() }
+.filter{ isType(it.ithChildren(1).ithChildren(3).ithChildren(1), "AST_DIM") }
+.filter{ isType(it.ithChildren(1).ithChildren(3).ithChildren(1).ithChildren(0), "AST_VAR") }
+.filter{ isType(it.ithChildren(1).ithChildren(4), "AST_STMT_LIST") }
+.filter{ isType(it.ithChildren(1).ithChildren(4).ithChildren(0), "AST_ECHO") }
+.filter{ isType(it.ithChildren(1).ithChildren(5), "AST_STMT_LIST") }
+.filter{ isType(it.ithChildren(1).ithChildren(5).ithChildren(0), "AST_ECHO") }
+.filter{ isType(it.ithChildren(1).ithChildren(5).ithChildren(0).ithChildren(0), "AST_BINARY_OP") }
+.filter{ isType(it.ithChildren(1).ithChildren(5).ithChildren(0).ithChildren(0).ithChildren(0), "AST_BINARY_OP") }
+.filter{ isType(it.ithChildren(1).ithChildren(5).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0), "AST_BINARY_OP") }
+.filter{ isType(it.ithChildren(1).ithChildren(5).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0), "AST_BINARY_OP") }
+.filter{ isType(it.ithChildren(1).ithChildren(5).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(1), "AST_VAR") }
+.filter{ it.ithChildren(1).ithChildren(5).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(1).varToName().next() == _FirstName }
+.filter{ isType(it.ithChildren(1).ithChildren(5).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(1), "AST_VAR") }
+.filter{ it.ithChildren(1).ithChildren(5).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(1).varToName().next() == _LastName }
+.filter{ isType(it.ithChildren(1).ithChildren(6), "AST_STMT_LIST") }
+.filter{ isType(it.ithChildren(1).ithChildren(6).ithChildren(0), "AST_ECHO") }
+.filter{ isType(it.ithChildren(1).ithChildren(6).ithChildren(0).ithChildren(0), "AST_BINARY_OP") }
+.filter{ isType(it.ithChildren(1).ithChildren(6).ithChildren(0).ithChildren(0).ithChildren(0), "AST_BINARY_OP") }
+.filter{ isType(it.ithChildren(1).ithChildren(6).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(1), "AST_VAR") }
+.filter{ it.ithChildren(1).ithChildren(6).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(1).varToName().next() == _PhoneNumber }
+.filter{ isType(it.ithChildren(1).ithChildren(7), "AST_STMT_LIST") }
+.filter{ isType(it.ithChildren(1).ithChildren(7).ithChildren(0), "AST_ECHO") }
+.filter{ isType(it.ithChildren(1).ithChildren(7).ithChildren(0).ithChildren(0), "AST_BINARY_OP") }
+.filter{ isType(it.ithChildren(1).ithChildren(7).ithChildren(0).ithChildren(0).ithChildren(0), "AST_BINARY_OP") }
+.filter{ isType(it.ithChildren(1).ithChildren(7).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0), "AST_BINARY_OP") }
+.filter{ isType(it.ithChildren(1).ithChildren(7).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0), "AST_BINARY_OP") }
+.filter{ isType(it.ithChildren(1).ithChildren(7).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0), "AST_BINARY_OP") }
+.filter{ isType(it.ithChildren(1).ithChildren(7).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(1), "AST_VAR") }
+.filter{ it.ithChildren(1).ithChildren(7).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(1).varToName().next() == _Email }
+.filter{ isType(it.ithChildren(1).ithChildren(7).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(1), "AST_VAR") }
+.filter{ it.ithChildren(1).ithChildren(7).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(1).varToName().next() == _Email }
+.filter{ isType(it.ithChildren(1).ithChildren(8), "AST_STMT_LIST") }
+.filter{ isType(it.ithChildren(1).ithChildren(8).ithChildren(0), "AST_ECHO") }
+
+// Prepare end of query.
+
+.sideEffect{ end_linenumber = it.lineno }
+.toFile()
+.fileToPath().sideEffect{ filename = it }
+
+// Print all found results.
+.transform{ printFoundCC(start_linenumber, end_linenumber, filename) }

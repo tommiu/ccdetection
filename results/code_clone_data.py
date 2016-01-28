@@ -11,14 +11,15 @@ class CodeCloneData(object):
     """
 
 
-    def __init__(self):
+    def __init__(self, path="", query_path="", ln_start=-1, ln_end=-1, query_time=-1):
         '''
         Constructor
         '''
-        self.path = ""
-        self.ln_start = -1
-        self.ln_end = -1
-        self.query_time = -1
+        self.path = path
+        self.ln_end = ln_end
+        self.ln_start = ln_start
+        self.query_time = query_time
+        self.query_path = query_path
         
     def stripDataFromOutput(self, output):
         """
@@ -42,6 +43,9 @@ class CodeCloneData(object):
         self.ln_end   = int(ln_end)
         self.ln_start = int(ln_start)
 
+    def setQueryFile(self, path):
+        self.query_path = path
+
     def setQueryTime(self, qt):
         self.query_time = qt
         
@@ -54,3 +58,15 @@ class CodeCloneData(object):
                     "Query time value is wrong. Maybe "
                     "it was not set? Query time: %d" % (self.query_time)
                     )
+    
+    def __str__(self):
+        _repr = (
+            "Code clone of query file '%s' "
+            "found in file '%s' "
+            "on lines %d to %d." % (
+                                self.query_path, self.path, 
+                                self.ln_start, self.ln_end
+                                )
+            )
+            
+        return _repr

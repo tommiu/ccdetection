@@ -1,9 +1,9 @@
 childnumber = 0
 
 // Initialize variables of query
-db_erg = ""
-db_link = ""
-sql = ""
+_db_erg = ""
+_db_link = ""
+_sql = ""
 
 // Start query.
 g.V
@@ -12,10 +12,7 @@ g.V
 // Parent #0
 .filter{ isType(it, "AST_CALL") }
 .filter{ isType(it.ithChildren(0), "AST_NAME") }
-.filter{ isType(it.ithChildren(0).ithChildren(0), "string") }
 .filter{ isType(it.ithChildren(1), "AST_ARG_LIST") }
-.filter{ isType(it.ithChildren(1).ithChildren(0), "string") }
-.filter{ isType(it.ithChildren(1).ithChildren(1), "string") }
 .sideEffect{ childnumber = it.childnum }
 .sideEffect{ childnumber = childnumber + 1 }
 
@@ -29,10 +26,7 @@ g.V
 // Parent #1
 .filter{ isType(it, "AST_CALL") }
 .filter{ isType(it.ithChildren(0), "AST_NAME") }
-.filter{ isType(it.ithChildren(0).ithChildren(0), "string") }
 .filter{ isType(it.ithChildren(1), "AST_ARG_LIST") }
-.filter{ isType(it.ithChildren(1).ithChildren(0), "string") }
-.filter{ isType(it.ithChildren(1).ithChildren(1), "string") }
 .sideEffect{ childnumber = it.childnum }
 .sideEffect{ childnumber = childnumber + 1 }
 
@@ -46,10 +40,7 @@ g.V
 // Parent #2
 .filter{ isType(it, "AST_CALL") }
 .filter{ isType(it.ithChildren(0), "AST_NAME") }
-.filter{ isType(it.ithChildren(0).ithChildren(0), "string") }
 .filter{ isType(it.ithChildren(1), "AST_ARG_LIST") }
-.filter{ isType(it.ithChildren(1).ithChildren(0), "string") }
-.filter{ isType(it.ithChildren(1).ithChildren(1), "string") }
 .sideEffect{ childnumber = it.childnum }
 .sideEffect{ childnumber = childnumber + 1 }
 
@@ -63,10 +54,7 @@ g.V
 // Parent #3
 .filter{ isType(it, "AST_CALL") }
 .filter{ isType(it.ithChildren(0), "AST_NAME") }
-.filter{ isType(it.ithChildren(0).ithChildren(0), "string") }
 .filter{ isType(it.ithChildren(1), "AST_ARG_LIST") }
-.filter{ isType(it.ithChildren(1).ithChildren(0), "string") }
-.filter{ isType(it.ithChildren(1).ithChildren(1), "string") }
 .sideEffect{ childnumber = it.childnum }
 .sideEffect{ childnumber = childnumber + 1 }
 
@@ -82,24 +70,18 @@ g.V
 .filter{ isType(it.ithChildren(0), "AST_VAR") }
 
 // Remember variable db_link
-.sideEffect{ db_link = it.ithChildren(0).varToName().next() }
-.filter{ isType(it.ithChildren(0).ithChildren(0), "string") }
+.sideEffect{ _db_link = it.ithChildren(0).varToName().next() }
 .filter{ isType(it.ithChildren(1), "AST_CALL") }
 .filter{ isType(it.ithChildren(1).ithChildren(0), "AST_NAME") }
-.filter{ isType(it.ithChildren(1).ithChildren(0).ithChildren(0), "string") }
 .filter{ isType(it.ithChildren(1).ithChildren(1), "AST_ARG_LIST") }
 .filter{ isType(it.ithChildren(1).ithChildren(1).ithChildren(0), "AST_CONST") }
 .filter{ isType(it.ithChildren(1).ithChildren(1).ithChildren(0).ithChildren(0), "AST_NAME") }
-.filter{ isType(it.ithChildren(1).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(0), "string") }
 .filter{ isType(it.ithChildren(1).ithChildren(1).ithChildren(1), "AST_CONST") }
 .filter{ isType(it.ithChildren(1).ithChildren(1).ithChildren(1).ithChildren(0), "AST_NAME") }
-.filter{ isType(it.ithChildren(1).ithChildren(1).ithChildren(1).ithChildren(0).ithChildren(0), "string") }
 .filter{ isType(it.ithChildren(1).ithChildren(1).ithChildren(2), "AST_CONST") }
 .filter{ isType(it.ithChildren(1).ithChildren(1).ithChildren(2).ithChildren(0), "AST_NAME") }
-.filter{ isType(it.ithChildren(1).ithChildren(1).ithChildren(2).ithChildren(0).ithChildren(0), "string") }
 .filter{ isType(it.ithChildren(1).ithChildren(1).ithChildren(3), "AST_CONST") }
 .filter{ isType(it.ithChildren(1).ithChildren(1).ithChildren(3).ithChildren(0), "AST_NAME") }
-.filter{ isType(it.ithChildren(1).ithChildren(1).ithChildren(3).ithChildren(0).ithChildren(0), "string") }
 .sideEffect{ childnumber = it.childnum }
 .sideEffect{ childnumber = childnumber + 1 }
 
@@ -115,11 +97,9 @@ g.V
 .filter{ isType(it.ithChildren(0), "AST_IF_ELEM") }
 .filter{ isType(it.ithChildren(0).ithChildren(0), "AST_UNARY_OP") }
 .filter{ isType(it.ithChildren(0).ithChildren(0).ithChildren(0), "AST_VAR") }
-.filter{ it.ithChildren(0).ithChildren(0).ithChildren(0).varToName().next() == db_link }
-.filter{ isType(it.ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0), "string") }
+.filter{ it.ithChildren(0).ithChildren(0).ithChildren(0).varToName().next() == _db_link }
 .filter{ isType(it.ithChildren(0).ithChildren(1), "AST_STMT_LIST") }
 .filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0), "AST_EXIT") }
-.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0), "string") }
 .sideEffect{ childnumber = it.childnum }
 .sideEffect{ childnumber = childnumber + 1 }
 
@@ -135,9 +115,7 @@ g.V
 .filter{ isType(it.ithChildren(0), "AST_VAR") }
 
 // Remember variable sql
-.sideEffect{ sql = it.ithChildren(0).varToName().next() }
-.filter{ isType(it.ithChildren(0).ithChildren(0), "string") }
-.filter{ isType(it.ithChildren(1), "string") }
+.sideEffect{ _sql = it.ithChildren(0).varToName().next() }
 .sideEffect{ childnumber = it.childnum }
 .sideEffect{ childnumber = childnumber + 1 }
 
@@ -151,9 +129,7 @@ g.V
 // Parent #7
 .filter{ isType(it, "AST_ASSIGN_OP") }
 .filter{ isType(it.ithChildren(0), "AST_VAR") }
-.filter{ it.ithChildren(0).varToName().next() == sql }
-.filter{ isType(it.ithChildren(0).ithChildren(0), "string") }
-.filter{ isType(it.ithChildren(1), "string") }
+.filter{ it.ithChildren(0).varToName().next() == _sql }
 .sideEffect{ childnumber = it.childnum }
 .sideEffect{ childnumber = childnumber + 1 }
 
@@ -167,16 +143,11 @@ g.V
 // Parent #8
 .filter{ isType(it, "AST_ASSIGN_OP") }
 .filter{ isType(it.ithChildren(0), "AST_VAR") }
-.filter{ it.ithChildren(0).varToName().next() == sql }
-.filter{ isType(it.ithChildren(0).ithChildren(0), "string") }
+.filter{ it.ithChildren(0).varToName().next() == _sql }
 .filter{ isType(it.ithChildren(1), "AST_BINARY_OP") }
 .filter{ isType(it.ithChildren(1).ithChildren(0), "AST_BINARY_OP") }
-.filter{ isType(it.ithChildren(1).ithChildren(0).ithChildren(0), "string") }
 .filter{ isType(it.ithChildren(1).ithChildren(0).ithChildren(1), "AST_DIM") }
 .filter{ isType(it.ithChildren(1).ithChildren(0).ithChildren(1).ithChildren(0), "AST_VAR") }
-.filter{ isType(it.ithChildren(1).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0), "string") }
-.filter{ isType(it.ithChildren(1).ithChildren(0).ithChildren(1).ithChildren(1), "string") }
-.filter{ isType(it.ithChildren(1).ithChildren(1), "string") }
 .sideEffect{ childnumber = it.childnum }
 .sideEffect{ childnumber = childnumber + 1 }
 
@@ -190,16 +161,11 @@ g.V
 // Parent #9
 .filter{ isType(it, "AST_ASSIGN_OP") }
 .filter{ isType(it.ithChildren(0), "AST_VAR") }
-.filter{ it.ithChildren(0).varToName().next() == sql }
-.filter{ isType(it.ithChildren(0).ithChildren(0), "string") }
+.filter{ it.ithChildren(0).varToName().next() == _sql }
 .filter{ isType(it.ithChildren(1), "AST_BINARY_OP") }
 .filter{ isType(it.ithChildren(1).ithChildren(0), "AST_BINARY_OP") }
-.filter{ isType(it.ithChildren(1).ithChildren(0).ithChildren(0), "string") }
 .filter{ isType(it.ithChildren(1).ithChildren(0).ithChildren(1), "AST_DIM") }
 .filter{ isType(it.ithChildren(1).ithChildren(0).ithChildren(1).ithChildren(0), "AST_VAR") }
-.filter{ isType(it.ithChildren(1).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0), "string") }
-.filter{ isType(it.ithChildren(1).ithChildren(0).ithChildren(1).ithChildren(1), "string") }
-.filter{ isType(it.ithChildren(1).ithChildren(1), "string") }
 .sideEffect{ childnumber = it.childnum }
 .sideEffect{ childnumber = childnumber + 1 }
 
@@ -213,16 +179,11 @@ g.V
 // Parent #10
 .filter{ isType(it, "AST_ASSIGN_OP") }
 .filter{ isType(it.ithChildren(0), "AST_VAR") }
-.filter{ it.ithChildren(0).varToName().next() == sql }
-.filter{ isType(it.ithChildren(0).ithChildren(0), "string") }
+.filter{ it.ithChildren(0).varToName().next() == _sql }
 .filter{ isType(it.ithChildren(1), "AST_BINARY_OP") }
 .filter{ isType(it.ithChildren(1).ithChildren(0), "AST_BINARY_OP") }
-.filter{ isType(it.ithChildren(1).ithChildren(0).ithChildren(0), "string") }
 .filter{ isType(it.ithChildren(1).ithChildren(0).ithChildren(1), "AST_DIM") }
 .filter{ isType(it.ithChildren(1).ithChildren(0).ithChildren(1).ithChildren(0), "AST_VAR") }
-.filter{ isType(it.ithChildren(1).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0), "string") }
-.filter{ isType(it.ithChildren(1).ithChildren(0).ithChildren(1).ithChildren(1), "string") }
-.filter{ isType(it.ithChildren(1).ithChildren(1), "string") }
 .sideEffect{ childnumber = it.childnum }
 .sideEffect{ childnumber = childnumber + 1 }
 
@@ -236,17 +197,12 @@ g.V
 // Parent #11
 .filter{ isType(it, "AST_ASSIGN_OP") }
 .filter{ isType(it.ithChildren(0), "AST_VAR") }
-.filter{ it.ithChildren(0).varToName().next() == sql }
-.filter{ isType(it.ithChildren(0).ithChildren(0), "string") }
+.filter{ it.ithChildren(0).varToName().next() == _sql }
 .filter{ isType(it.ithChildren(1), "AST_BINARY_OP") }
 .filter{ isType(it.ithChildren(1).ithChildren(0), "AST_BINARY_OP") }
-.filter{ isType(it.ithChildren(1).ithChildren(0).ithChildren(0), "string") }
 .filter{ isType(it.ithChildren(1).ithChildren(0).ithChildren(1), "AST_CALL") }
 .filter{ isType(it.ithChildren(1).ithChildren(0).ithChildren(1).ithChildren(0), "AST_NAME") }
-.filter{ isType(it.ithChildren(1).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0), "string") }
 .filter{ isType(it.ithChildren(1).ithChildren(0).ithChildren(1).ithChildren(1), "AST_ARG_LIST") }
-.filter{ isType(it.ithChildren(1).ithChildren(0).ithChildren(1).ithChildren(1).ithChildren(0), "string") }
-.filter{ isType(it.ithChildren(1).ithChildren(1), "string") }
 .sideEffect{ childnumber = it.childnum }
 .sideEffect{ childnumber = childnumber + 1 }
 
@@ -260,16 +216,11 @@ g.V
 // Parent #12
 .filter{ isType(it, "AST_ASSIGN_OP") }
 .filter{ isType(it.ithChildren(0), "AST_VAR") }
-.filter{ it.ithChildren(0).varToName().next() == sql }
-.filter{ isType(it.ithChildren(0).ithChildren(0), "string") }
+.filter{ it.ithChildren(0).varToName().next() == _sql }
 .filter{ isType(it.ithChildren(1), "AST_BINARY_OP") }
 .filter{ isType(it.ithChildren(1).ithChildren(0), "AST_BINARY_OP") }
-.filter{ isType(it.ithChildren(1).ithChildren(0).ithChildren(0), "string") }
 .filter{ isType(it.ithChildren(1).ithChildren(0).ithChildren(1), "AST_DIM") }
 .filter{ isType(it.ithChildren(1).ithChildren(0).ithChildren(1).ithChildren(0), "AST_VAR") }
-.filter{ isType(it.ithChildren(1).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0), "string") }
-.filter{ isType(it.ithChildren(1).ithChildren(0).ithChildren(1).ithChildren(1), "string") }
-.filter{ isType(it.ithChildren(1).ithChildren(1), "string") }
 .sideEffect{ childnumber = it.childnum }
 .sideEffect{ childnumber = childnumber + 1 }
 
@@ -284,11 +235,8 @@ g.V
 .filter{ isType(it, "AST_STMT_LIST") }
 .filter{ isType(it.ithChildren(0), "AST_ECHO") }
 .filter{ isType(it.ithChildren(0).ithChildren(0), "AST_ENCAPS_LIST") }
-.filter{ isType(it.ithChildren(0).ithChildren(0).ithChildren(0), "string") }
 .filter{ isType(it.ithChildren(0).ithChildren(0).ithChildren(1), "AST_VAR") }
-.filter{ it.ithChildren(0).ithChildren(0).ithChildren(1).varToName().next() == sql }
-.filter{ isType(it.ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0), "string") }
-.filter{ isType(it.ithChildren(0).ithChildren(0).ithChildren(2), "string") }
+.filter{ it.ithChildren(0).ithChildren(0).ithChildren(1).varToName().next() == _sql }
 .sideEffect{ childnumber = it.childnum }
 .sideEffect{ childnumber = childnumber + 1 }
 
@@ -304,18 +252,14 @@ g.V
 .filter{ isType(it.ithChildren(0), "AST_VAR") }
 
 // Remember variable db_erg
-.sideEffect{ db_erg = it.ithChildren(0).varToName().next() }
-.filter{ isType(it.ithChildren(0).ithChildren(0), "string") }
+.sideEffect{ _db_erg = it.ithChildren(0).varToName().next() }
 .filter{ isType(it.ithChildren(1), "AST_CALL") }
 .filter{ isType(it.ithChildren(1).ithChildren(0), "AST_NAME") }
-.filter{ isType(it.ithChildren(1).ithChildren(0).ithChildren(0), "string") }
 .filter{ isType(it.ithChildren(1).ithChildren(1), "AST_ARG_LIST") }
 .filter{ isType(it.ithChildren(1).ithChildren(1).ithChildren(0), "AST_VAR") }
-.filter{ it.ithChildren(1).ithChildren(1).ithChildren(0).varToName().next() == db_link }
-.filter{ isType(it.ithChildren(1).ithChildren(1).ithChildren(0).ithChildren(0), "string") }
+.filter{ it.ithChildren(1).ithChildren(1).ithChildren(0).varToName().next() == _db_link }
 .filter{ isType(it.ithChildren(1).ithChildren(1).ithChildren(1), "AST_VAR") }
-.filter{ it.ithChildren(1).ithChildren(1).ithChildren(1).varToName().next() == sql }
-.filter{ isType(it.ithChildren(1).ithChildren(1).ithChildren(1).ithChildren(0), "string") }
+.filter{ it.ithChildren(1).ithChildren(1).ithChildren(1).varToName().next() == _sql }
 .sideEffect{ childnumber = it.childnum }
 .sideEffect{ childnumber = childnumber + 1 }
 
@@ -331,15 +275,12 @@ g.V
 .filter{ isType(it.ithChildren(0), "AST_IF_ELEM") }
 .filter{ isType(it.ithChildren(0).ithChildren(0), "AST_UNARY_OP") }
 .filter{ isType(it.ithChildren(0).ithChildren(0).ithChildren(0), "AST_VAR") }
-.filter{ it.ithChildren(0).ithChildren(0).ithChildren(0).varToName().next() == db_erg }
-.filter{ isType(it.ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(0), "string") }
+.filter{ it.ithChildren(0).ithChildren(0).ithChildren(0).varToName().next() == _db_erg }
 .filter{ isType(it.ithChildren(0).ithChildren(1), "AST_STMT_LIST") }
 .filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0), "AST_EXIT") }
 .filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0), "AST_BINARY_OP") }
-.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(0), "string") }
 .filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1), "AST_CALL") }
 .filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0), "AST_NAME") }
-.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0), "string") }
 .filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(1), "AST_ARG_LIST") }
 
 // Prepare end of query.

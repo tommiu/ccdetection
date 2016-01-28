@@ -24,7 +24,9 @@ ARGS_SEARCH  = "search"
 ARGS_CONFIG  = "config"
 ARGS_CONSOLE = "console"
 ARGS_PRINT_STATS = "print_stats"
-ARGS_CONTINUOUS_SEARCH = "continuous_search"
+ARGS_PRINT_RESULTS = "print_results"
+ARGS_CONTINUOUS_SEARCH  = "continuous_search"
+ARGS_COMBINE_STATISTICS = "combine_stats"
 
 CONFIG_PATH = "config"
 DEFAULT_STATS_PATH  = "stats"
@@ -65,6 +67,9 @@ def main(argv):
     if flow[parser.KEY_MODE] == ARGS_HELP:
         parser.printHelp(argv[0])
         sys.exit()
+        
+    elif flow[parser.KEY_MODE] == ARGS_COMBINE_STATISTICS:
+        combineStatsFiles(flow)
     
     elif flow[parser.KEY_MODE] == ARGS_CONSOLE:
         id = 1
@@ -89,6 +94,9 @@ def main(argv):
     
     elif flow[parser.KEY_MODE] == ARGS_PRINT_STATS:
         printStats(flow)
+        
+    elif flow[parser.KEY_MODE] == ARGS_PRINT_RESULTS:
+        printResults(flow)
 
     else:
         parser.printHelp(argv[0])
@@ -102,9 +110,65 @@ def printStats(flow):
     
     if os.path.isfile(stats_path):
         print "Statistics file: '%s'" % (stats_path)
-        print SharedData(stats_path)
+        print SharedData(stats_path, multiprocessing.Lock())
     else:
         print "Given path is not a valid file: '%s'" % (stats_path)
+
+def printResults(flow):
+    try:
+        stats_path = getArg(flow, 's', 'statsfile')
+    except:
+        stats_path = DEFAULT_STATS_PATH
+    
+    if os.path.isfile(stats_path):
+        clones = SharedData(stats_path, multiprocessing.Lock()).getClones()
+        print "Found %d code clones saved in file '%s':" % (
+                                                        len(clones), stats_path
+                                                        )
+        for i, clone in enumerate(clones):
+            print str(i) + ".", clone
+            
+    else:
+        print "Given path is not a valid file: '%s'" % (stats_path)
+        
+        
+def combineStatsFiles(flow):
+    _files = getArg(flow, "s", "stats")
+    _out   = getArg(flow, "out")
+    
+    _files = _files.split(",")
+    
+    try:
+        # Remove empty elements.
+        _files.remove("")
+        
+    except ValueError as err:
+        # No element was removed.
+        pass
+    
+    # Remove unnecessary whitespace characters.
+    _files = [_file.strip() for _file in _files]
+    
+    
+    if len(_files) > 1:
+        for _file in _files:
+            if not os.path.isfile(_file):
+                raise Exception("'%s' is not a file." % (_file))
+            
+        lock = multiprocessing.Lock()
+        first_data = SharedData(_files[0], lock)
+        
+        for _file in _files[1:]:
+            data = SharedData(_file, lock)
+            first_data.combineWith(data)
+            
+        first_data.saveToFile(_out)
+        
+        print "Stats files combined into '%s'" % (_out)
+        
+    else:
+        print "Specify more than one statistics file. Separate them with commas."
+        print "I.e. -s \"\""
         
 def startSearchMode(flow, continuous=False):
     flow["in"] = os.path.abspath(flow["in"])
@@ -123,7 +187,19 @@ def startSearchMode(flow, continuous=False):
         except:
             stats_path = DEFAULT_STATS_PATH
 
-        shared_data = SharedData(stats_path)
+        lock = multiprocessing.Lock()
+        shared_data = SharedData(stats_path, lock, in_path=flow["in"])
+        in_path = shared_data.getInPath()
+        
+        if in_path != flow["in"]:
+                    print (
+                        "The given path with \"-in\" is not the path, "
+                        "which was used before."
+                        )
+                    _ = raw_input("Ctrl-C or Ctrl-D to abort. "
+                                           "Press any key to continue")
+        
+        shared_data.setInPath(flow["in"])
         
         Neo4jHelper.setStatisticsObj(shared_data)
 
@@ -131,10 +207,10 @@ def startSearchMode(flow, continuous=False):
         multithreads = int(getArg(flow, "m", "multithreading"))
     except:
         pass
-    
+
     code_path = getArg(flow, "q", "queries")
     code = []
-    
+
     # Read given query.
     if os.path.isfile(code_path):
         with open(code_path, "r") as fh:
@@ -183,6 +259,16 @@ def startSearchMode(flow, continuous=False):
         try:
             # Get the root directory of every project in a generator.
             path_generator = getRootDirectories(flow["in"], level)
+            
+            if continuous:
+                # Check if given in-path is the same as the one in the
+                # given stats file.
+                
+                if in_path == flow["in"]:
+                    # Skip generator elements if they were already
+                    # analysed before.
+                    projects_analysed_count = shared_data.getProjectsCount()
+                    skipGeneratorElements(path_generator, projects_analysed_count)
 
         except Exception as err:
             print "An exception occured: %s" % err
@@ -192,7 +278,7 @@ def startSearchMode(flow, continuous=False):
         
         if multithreads > 1:
             # Multithreading was specified.
-            
+
             process_number_generator = ProcessIdGenerator()
             
             # Start a lazy pool of processes.
@@ -204,7 +290,7 @@ def startSearchMode(flow, continuous=False):
                     multithreads,
                     process_number_generator
                     )
-    
+
             # And let them work.
             try:
                 while True:
@@ -216,7 +302,7 @@ def startSearchMode(flow, continuous=False):
                 # Done
                 print err
                 pass
-    
+
         else:    
             # No multithreading.
             for path in path_generator:
@@ -232,6 +318,14 @@ def startSearchMode(flow, continuous=False):
 
 def analyseDataHelper(args):
     return Neo4jHelper.analyseData(args)
+
+def skipGeneratorElements(_gen, count):
+    try:
+        for _ in xrange(count):
+            print "Skipping", _gen.next()
+    except StopIteration:
+        raise Exception("Could not skip given paths as expected, stopping.")
+        
 
 def getRootDirectories(path, level):    
     """
@@ -350,12 +444,24 @@ def setupArgs(parser):
                                 explanation=explanation
                                 )
     
-    # Open neo4j console: config -p/--path dir/file
+    
+    # Print results (found code clones): print_results (-s file)
+    explanation = (
+                "Print out the results (=found code clones) from previous "
+                "'continuous_search'-mode runs."
+                )
+    parser.addArgumentsCombination(
+                                ARGS_PRINT_RESULTS,
+                                [],
+                                [["s=", "statsfile"]],
+                                explanation=explanation
+                                )
+    
+    # Configurate paths for ccdetection: config -p/--path dir/file
     explanation = (
                 "Setup the config file using the specified path in '-p/--path'."
                 " The config file contains all the necessary paths for "
                 "ccdetection to work correctly."
-                "Use \"-id integer\" to use another neo4j database instance."
                 )
     parser.addArgumentsCombination(
                                 ARGS_CONFIG,
@@ -365,13 +471,29 @@ def setupArgs(parser):
     
     # Open neo4j console: console -in dir/file
     explanation = (
-                "Import the php file/project AST into the neo4j database and "
-                "start the neo4j console."
+                "Import the php file/project AST into the Neo4j database and "
+                "start the Neo4j console. "
+                "Use \"-id integer\" to use another Neo4j database instance."
                 )
     parser.addArgumentsCombination(
                                 ARGS_CONSOLE,
                                 [["in=", None]],
                                 [["id=", None]],
+                                explanation=explanation
+                                )
+    
+    # Combine stats files: console -s/--stats "file1, file2, ..." -out file
+    explanation = (
+                "Combine multiple statistics files specified with -s/--stats"
+                ", separated by commas, into one and save it "
+                "to the path specified with -out."
+                )
+    parser.addArgumentsCombination(
+                                ARGS_COMBINE_STATISTICS,
+                                [
+                            ["s=", "stats"], 
+                            ["out=", None]
+                            ],
                                 explanation=explanation
                                 )
 

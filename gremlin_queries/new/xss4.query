@@ -1,0 +1,124 @@
+childnumber = 0
+
+// Initialize variables of query
+_zeile = ""
+_db_erg = ""
+
+// Start query.
+g.V
+.sideEffect{ start_linenumber = it.lineno }
+
+// Parent #0
+.filter{ isType(it, "AST_STMT_LIST") }
+.filter{ isType(it.ithChildren(0), "AST_ECHO") }
+.sideEffect{ childnumber = it.childnum }
+.sideEffect{ childnumber = childnumber + 1 }
+
+// Go up one level.
+.parents()
+.children()
+
+// Check next AST-node (similar to next line of code)
+.filter{ it.childnum == childnumber }
+
+// Parent #1
+.filter{ isType(it, "AST_WHILE") }
+.filter{ isType(it.ithChildren(0), "AST_ASSIGN") }
+.filter{ isType(it.ithChildren(0).ithChildren(0), "AST_VAR") }
+
+// Remember variable zeile
+.sideEffect{ _zeile = it.ithChildren(0).ithChildren(0).varToName().next() }
+.filter{ isType(it.ithChildren(0).ithChildren(1), "AST_CALL") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(0), "AST_NAME") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(1), "AST_ARG_LIST") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(1).ithChildren(0), "AST_VAR") }
+
+// Remember variable db_erg
+.sideEffect{ _db_erg = it.ithChildren(0).ithChildren(1).ithChildren(1).ithChildren(0).varToName().next() }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(1).ithChildren(1), "AST_CONST") }
+.filter{ isType(it.ithChildren(0).ithChildren(1).ithChildren(1).ithChildren(1).ithChildren(0), "AST_NAME") }
+.filter{ isType(it.ithChildren(1), "AST_STMT_LIST") }
+.filter{ isType(it.ithChildren(1).ithChildren(0), "AST_STMT_LIST") }
+.filter{ isType(it.ithChildren(1).ithChildren(0).ithChildren(0), "AST_ECHO") }
+.filter{ isType(it.ithChildren(1).ithChildren(1), "AST_STMT_LIST") }
+.filter{ isType(it.ithChildren(1).ithChildren(1).ithChildren(0), "AST_ECHO") }
+.filter{ isType(it.ithChildren(1).ithChildren(1).ithChildren(0).ithChildren(0), "AST_BINARY_OP") }
+.filter{ isType(it.ithChildren(1).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(0), "AST_BINARY_OP") }
+.filter{ isType(it.ithChildren(1).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(1), "AST_DIM") }
+.filter{ isType(it.ithChildren(1).ithChildren(1).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0), "AST_VAR") }
+.filter{ isType(it.ithChildren(1).ithChildren(2), "AST_STMT_LIST") }
+.filter{ isType(it.ithChildren(1).ithChildren(2).ithChildren(0), "AST_ECHO") }
+.filter{ isType(it.ithChildren(1).ithChildren(2).ithChildren(0).ithChildren(0), "AST_BINARY_OP") }
+.filter{ isType(it.ithChildren(1).ithChildren(2).ithChildren(0).ithChildren(0).ithChildren(0), "AST_BINARY_OP") }
+.filter{ isType(it.ithChildren(1).ithChildren(2).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(1), "AST_DIM") }
+.filter{ isType(it.ithChildren(1).ithChildren(2).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0), "AST_VAR") }
+.filter{ isType(it.ithChildren(1).ithChildren(3), "AST_STMT_LIST") }
+.filter{ isType(it.ithChildren(1).ithChildren(3).ithChildren(0), "AST_ECHO") }
+.filter{ isType(it.ithChildren(1).ithChildren(3).ithChildren(0).ithChildren(0), "AST_BINARY_OP") }
+.filter{ isType(it.ithChildren(1).ithChildren(3).ithChildren(0).ithChildren(0).ithChildren(0), "AST_BINARY_OP") }
+.filter{ isType(it.ithChildren(1).ithChildren(3).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(1), "AST_DIM") }
+.filter{ isType(it.ithChildren(1).ithChildren(3).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0), "AST_VAR") }
+.filter{ isType(it.ithChildren(1).ithChildren(4), "AST_STMT_LIST") }
+.filter{ isType(it.ithChildren(1).ithChildren(4).ithChildren(0), "AST_ECHO") }
+.filter{ isType(it.ithChildren(1).ithChildren(4).ithChildren(0).ithChildren(0), "AST_BINARY_OP") }
+.filter{ isType(it.ithChildren(1).ithChildren(4).ithChildren(0).ithChildren(0).ithChildren(0), "AST_BINARY_OP") }
+.filter{ isType(it.ithChildren(1).ithChildren(4).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(1), "AST_DIM") }
+.filter{ isType(it.ithChildren(1).ithChildren(4).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0), "AST_VAR") }
+.filter{ isType(it.ithChildren(1).ithChildren(5), "AST_STMT_LIST") }
+.filter{ isType(it.ithChildren(1).ithChildren(5).ithChildren(0), "AST_ECHO") }
+.filter{ isType(it.ithChildren(1).ithChildren(5).ithChildren(0).ithChildren(0), "AST_BINARY_OP") }
+.filter{ isType(it.ithChildren(1).ithChildren(5).ithChildren(0).ithChildren(0).ithChildren(0), "AST_BINARY_OP") }
+.filter{ isType(it.ithChildren(1).ithChildren(5).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(1), "AST_DIM") }
+.filter{ isType(it.ithChildren(1).ithChildren(5).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0), "AST_VAR") }
+.filter{ isType(it.ithChildren(1).ithChildren(6), "AST_STMT_LIST") }
+.filter{ isType(it.ithChildren(1).ithChildren(6).ithChildren(0), "AST_ECHO") }
+.filter{ isType(it.ithChildren(1).ithChildren(6).ithChildren(0).ithChildren(0), "AST_BINARY_OP") }
+.filter{ isType(it.ithChildren(1).ithChildren(6).ithChildren(0).ithChildren(0).ithChildren(0), "AST_BINARY_OP") }
+.filter{ isType(it.ithChildren(1).ithChildren(6).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(1), "AST_DIM") }
+.filter{ isType(it.ithChildren(1).ithChildren(6).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0), "AST_VAR") }
+.filter{ isType(it.ithChildren(1).ithChildren(7), "AST_STMT_LIST") }
+.filter{ isType(it.ithChildren(1).ithChildren(7).ithChildren(0), "AST_ECHO") }
+.filter{ isType(it.ithChildren(1).ithChildren(7).ithChildren(0).ithChildren(0), "AST_BINARY_OP") }
+.filter{ isType(it.ithChildren(1).ithChildren(7).ithChildren(0).ithChildren(0).ithChildren(0), "AST_BINARY_OP") }
+.filter{ isType(it.ithChildren(1).ithChildren(7).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(1), "AST_DIM") }
+.filter{ isType(it.ithChildren(1).ithChildren(7).ithChildren(0).ithChildren(0).ithChildren(0).ithChildren(1).ithChildren(0), "AST_VAR") }
+.filter{ isType(it.ithChildren(1).ithChildren(8), "AST_STMT_LIST") }
+.filter{ isType(it.ithChildren(1).ithChildren(8).ithChildren(0), "AST_ECHO") }
+.sideEffect{ childnumber = it.childnum }
+.sideEffect{ childnumber = childnumber + 1 }
+
+// Go up one level.
+.parents()
+.children()
+
+// Check next AST-node (similar to next line of code)
+.filter{ it.childnum == childnumber }
+
+// Parent #2
+.filter{ isType(it, "AST_STMT_LIST") }
+.filter{ isType(it.ithChildren(0), "AST_ECHO") }
+.sideEffect{ childnumber = it.childnum }
+.sideEffect{ childnumber = childnumber + 1 }
+
+// Go up one level.
+.parents()
+.children()
+
+// Check next AST-node (similar to next line of code)
+.filter{ it.childnum == childnumber }
+
+// Parent #3
+.filter{ isType(it, "AST_CALL") }
+.filter{ isType(it.ithChildren(0), "AST_NAME") }
+.filter{ isType(it.ithChildren(1), "AST_ARG_LIST") }
+.filter{ isType(it.ithChildren(1).ithChildren(0), "AST_VAR") }
+.filter{ it.ithChildren(1).ithChildren(0).varToName().next() == _db_erg }
+
+// Prepare end of query.
+
+.sideEffect{ end_linenumber = it.lineno }
+.toFile()
+.fileToPath().sideEffect{ filename = it }
+
+// Print all found results.
+.transform{ printFoundCC(start_linenumber, end_linenumber, filename) }

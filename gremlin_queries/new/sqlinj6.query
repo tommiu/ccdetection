@@ -1,0 +1,172 @@
+childnumber = 0
+
+// Initialize variables of query
+_db_erg = ""
+_db_link = ""
+_sql = ""
+
+// Start query.
+g.V
+.sideEffect{ start_linenumber = it.lineno }
+
+// Parent #0
+.filter{ isType(it, "AST_ASSIGN") }
+.filter{ isType(it.ithChildren(0), "AST_VAR") }
+
+// Remember variable sql
+.sideEffect{ _sql = it.ithChildren(0).varToName().next() }
+.sideEffect{ childnumber = it.childnum }
+.sideEffect{ childnumber = childnumber + 1 }
+
+// Go up one level.
+.parents()
+.children()
+
+// Check next AST-node (similar to next line of code)
+.filter{ it.childnum == childnumber }
+
+// Parent #1
+.filter{ isType(it, "AST_ASSIGN_OP") }
+.filter{ isType(it.ithChildren(0), "AST_VAR") }
+.filter{ it.ithChildren(0).varToName().next() == _sql }
+.sideEffect{ childnumber = it.childnum }
+.sideEffect{ childnumber = childnumber + 1 }
+
+// Go up one level.
+.parents()
+.children()
+
+// Check next AST-node (similar to next line of code)
+.filter{ it.childnum == childnumber }
+
+// Parent #2
+.filter{ isType(it, "AST_ASSIGN_OP") }
+.filter{ isType(it.ithChildren(0), "AST_VAR") }
+.filter{ it.ithChildren(0).varToName().next() == _sql }
+.filter{ isType(it.ithChildren(1), "AST_BINARY_OP") }
+.filter{ isType(it.ithChildren(1).ithChildren(0), "AST_BINARY_OP") }
+.filter{ isType(it.ithChildren(1).ithChildren(0).ithChildren(1), "AST_DIM") }
+.filter{ isType(it.ithChildren(1).ithChildren(0).ithChildren(1).ithChildren(0), "AST_VAR") }
+.sideEffect{ childnumber = it.childnum }
+.sideEffect{ childnumber = childnumber + 1 }
+
+// Go up one level.
+.parents()
+.children()
+
+// Check next AST-node (similar to next line of code)
+.filter{ it.childnum == childnumber }
+
+// Parent #3
+.filter{ isType(it, "AST_ASSIGN_OP") }
+.filter{ isType(it.ithChildren(0), "AST_VAR") }
+.filter{ it.ithChildren(0).varToName().next() == _sql }
+.filter{ isType(it.ithChildren(1), "AST_BINARY_OP") }
+.filter{ isType(it.ithChildren(1).ithChildren(0), "AST_BINARY_OP") }
+.filter{ isType(it.ithChildren(1).ithChildren(0).ithChildren(1), "AST_DIM") }
+.filter{ isType(it.ithChildren(1).ithChildren(0).ithChildren(1).ithChildren(0), "AST_VAR") }
+.sideEffect{ childnumber = it.childnum }
+.sideEffect{ childnumber = childnumber + 1 }
+
+// Go up one level.
+.parents()
+.children()
+
+// Check next AST-node (similar to next line of code)
+.filter{ it.childnum == childnumber }
+
+// Parent #4
+.filter{ isType(it, "AST_ASSIGN_OP") }
+.filter{ isType(it.ithChildren(0), "AST_VAR") }
+.filter{ it.ithChildren(0).varToName().next() == _sql }
+.filter{ isType(it.ithChildren(1), "AST_BINARY_OP") }
+.filter{ isType(it.ithChildren(1).ithChildren(0), "AST_BINARY_OP") }
+.filter{ isType(it.ithChildren(1).ithChildren(0).ithChildren(1), "AST_DIM") }
+.filter{ isType(it.ithChildren(1).ithChildren(0).ithChildren(1).ithChildren(0), "AST_VAR") }
+.sideEffect{ childnumber = it.childnum }
+.sideEffect{ childnumber = childnumber + 1 }
+
+// Go up one level.
+.parents()
+.children()
+
+// Check next AST-node (similar to next line of code)
+.filter{ it.childnum == childnumber }
+
+// Parent #5
+.filter{ isType(it, "AST_ASSIGN_OP") }
+.filter{ isType(it.ithChildren(0), "AST_VAR") }
+.filter{ it.ithChildren(0).varToName().next() == _sql }
+.filter{ isType(it.ithChildren(1), "AST_BINARY_OP") }
+.filter{ isType(it.ithChildren(1).ithChildren(0), "AST_BINARY_OP") }
+.filter{ isType(it.ithChildren(1).ithChildren(0).ithChildren(1), "AST_CALL") }
+.filter{ isType(it.ithChildren(1).ithChildren(0).ithChildren(1).ithChildren(0), "AST_NAME") }
+.filter{ isType(it.ithChildren(1).ithChildren(0).ithChildren(1).ithChildren(1), "AST_ARG_LIST") }
+.sideEffect{ childnumber = it.childnum }
+.sideEffect{ childnumber = childnumber + 1 }
+
+// Go up one level.
+.parents()
+.children()
+
+// Check next AST-node (similar to next line of code)
+.filter{ it.childnum == childnumber }
+
+// Parent #6
+.filter{ isType(it, "AST_ASSIGN_OP") }
+.filter{ isType(it.ithChildren(0), "AST_VAR") }
+.filter{ it.ithChildren(0).varToName().next() == _sql }
+.filter{ isType(it.ithChildren(1), "AST_BINARY_OP") }
+.filter{ isType(it.ithChildren(1).ithChildren(0), "AST_BINARY_OP") }
+.filter{ isType(it.ithChildren(1).ithChildren(0).ithChildren(1), "AST_DIM") }
+.filter{ isType(it.ithChildren(1).ithChildren(0).ithChildren(1).ithChildren(0), "AST_VAR") }
+.sideEffect{ childnumber = it.childnum }
+.sideEffect{ childnumber = childnumber + 1 }
+
+// Go up one level.
+.parents()
+.children()
+
+// Check next AST-node (similar to next line of code)
+.filter{ it.childnum == childnumber }
+
+// Parent #7
+.filter{ isType(it, "AST_STMT_LIST") }
+.filter{ isType(it.ithChildren(0), "AST_ECHO") }
+.filter{ isType(it.ithChildren(0).ithChildren(0), "AST_ENCAPS_LIST") }
+.filter{ isType(it.ithChildren(0).ithChildren(0).ithChildren(1), "AST_VAR") }
+.filter{ it.ithChildren(0).ithChildren(0).ithChildren(1).varToName().next() == _sql }
+.sideEffect{ childnumber = it.childnum }
+.sideEffect{ childnumber = childnumber + 1 }
+
+// Go up one level.
+.parents()
+.children()
+
+// Check next AST-node (similar to next line of code)
+.filter{ it.childnum == childnumber }
+
+// Parent #8
+.filter{ isType(it, "AST_ASSIGN") }
+.filter{ isType(it.ithChildren(0), "AST_VAR") }
+
+// Remember variable db_erg
+.sideEffect{ _db_erg = it.ithChildren(0).varToName().next() }
+.filter{ isType(it.ithChildren(1), "AST_CALL") }
+.filter{ isType(it.ithChildren(1).ithChildren(0), "AST_NAME") }
+.filter{ isType(it.ithChildren(1).ithChildren(1), "AST_ARG_LIST") }
+.filter{ isType(it.ithChildren(1).ithChildren(1).ithChildren(0), "AST_VAR") }
+
+// Remember variable db_link
+.sideEffect{ _db_link = it.ithChildren(1).ithChildren(1).ithChildren(0).varToName().next() }
+.filter{ isType(it.ithChildren(1).ithChildren(1).ithChildren(1), "AST_VAR") }
+.filter{ it.ithChildren(1).ithChildren(1).ithChildren(1).varToName().next() == _sql }
+
+// Prepare end of query.
+
+.sideEffect{ end_linenumber = it.lineno }
+.toFile()
+.fileToPath().sideEffect{ filename = it }
+
+// Print all found results.
+.transform{ printFoundCC(start_linenumber, end_linenumber, filename) }

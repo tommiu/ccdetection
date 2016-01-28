@@ -1,0 +1,71 @@
+childnumber = 0
+
+// Initialize variables of query
+_found = ""
+_result = ""
+_title = ""
+
+// Start query.
+g.V
+.sideEffect{ start_linenumber = it.lineno }
+
+// Parent #0
+.filter{ isType(it, "AST_ASSIGN") }
+.filter{ isType(it.ithChildren(0), "AST_VAR") }
+
+// Remember variable title
+.sideEffect{ _title = it.ithChildren(0).varToName().next() }
+.filter{ isType(it.ithChildren(1), "AST_DIM") }
+.filter{ isType(it.ithChildren(1).ithChildren(0), "AST_VAR") }
+.sideEffect{ childnumber = it.childnum }
+.sideEffect{ childnumber = childnumber + 1 }
+
+// Go up one level.
+.parents()
+.children()
+
+// Check next AST-node (similar to next line of code)
+.filter{ it.childnum == childnumber }
+
+// Parent #1
+.filter{ isType(it, "AST_ASSIGN") }
+.filter{ isType(it.ithChildren(0), "AST_VAR") }
+
+// Remember variable result
+.sideEffect{ _result = it.ithChildren(0).varToName().next() }
+.filter{ isType(it.ithChildren(1), "AST_CALL") }
+.filter{ isType(it.ithChildren(1).ithChildren(0), "AST_NAME") }
+.filter{ isType(it.ithChildren(1).ithChildren(1), "AST_ARG_LIST") }
+.filter{ isType(it.ithChildren(1).ithChildren(1).ithChildren(0), "AST_ENCAPS_LIST") }
+.filter{ isType(it.ithChildren(1).ithChildren(1).ithChildren(0).ithChildren(1), "AST_VAR") }
+.filter{ it.ithChildren(1).ithChildren(1).ithChildren(0).ithChildren(1).varToName().next() == _title }
+.sideEffect{ childnumber = it.childnum }
+.sideEffect{ childnumber = childnumber + 1 }
+
+// Go up one level.
+.parents()
+.children()
+
+// Check next AST-node (similar to next line of code)
+.filter{ it.childnum == childnumber }
+
+// Parent #2
+.filter{ isType(it, "AST_ASSIGN") }
+.filter{ isType(it.ithChildren(0), "AST_VAR") }
+
+// Remember variable found
+.sideEffect{ _found = it.ithChildren(0).varToName().next() }
+.filter{ isType(it.ithChildren(1), "AST_CALL") }
+.filter{ isType(it.ithChildren(1).ithChildren(0), "AST_NAME") }
+.filter{ isType(it.ithChildren(1).ithChildren(1), "AST_ARG_LIST") }
+.filter{ isType(it.ithChildren(1).ithChildren(1).ithChildren(0), "AST_VAR") }
+.filter{ it.ithChildren(1).ithChildren(1).ithChildren(0).varToName().next() == _result }
+
+// Prepare end of query.
+
+.sideEffect{ end_linenumber = it.lineno }
+.toFile()
+.fileToPath().sideEffect{ filename = it }
+
+// Print all found results.
+.transform{ printFoundCC(start_linenumber, end_linenumber, filename) }
