@@ -131,20 +131,20 @@ class Neo4jHelper(object):
                         "ERROR: No write access to data/ directory"
                         ])
         
-        if expectation == 2:
+        if expectation == 1:
             # BindException (port already taken?)
             raise BindException()
         
-        elif expectation == 3:
+        elif expectation == 2:
             # Unable to create directory path
             raise PathException()
        
-        elif expectation == 4:
+        elif expectation == 3:
             # EOF
             # print process.before
             raise BindException()
         
-        elif expectation == 5:
+        elif expectation == 4:
             raise Exception(
                     "ERROR: No write access to neo4j data directory. "
                     "Check for sufficient write permissions in all neo4j "
