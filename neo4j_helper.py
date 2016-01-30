@@ -100,8 +100,9 @@ class Neo4jHelper(object):
             print exception
             return Neo4jHelper.analyseData(code_and_path_and_process_number)
             
-#             raise Exception(exception)
-            
+        except Exception as err:
+            print err
+            raise Exception("Critical error, exiting.")
         
         return process_number
     
@@ -113,8 +114,7 @@ class Neo4jHelper(object):
                             Configurator.getPath(Configurator.KEY_SPAWN_SCRIPT),
                             [
                     Configurator.getPath(Configurator.KEY_BASE_DIR) + "/config", 
-                    path, str(process_number),
-                    Configurator.getPath(Configurator.KEY_PHP_PARSE_RESULTS) 
+                    path, str(process_number)
                     ],
                             None
                             )
@@ -127,7 +127,8 @@ class Neo4jHelper(object):
                         "Remote interface ready", 
                         "java.net.BindException",
                         "java.io.IOException: Unable to create directory path",
-                        pexpect.EOF
+                        pexpect.EOF,
+                        "ERROR: No write access to data/ directory"
                         ])
         
         if expectation == 2:
@@ -142,6 +143,13 @@ class Neo4jHelper(object):
             # EOF
             # print process.before
             raise BindException()
+        
+        elif expectation == 5:
+            raise Exception(
+                    "ERROR: No write access to neo4j data directory. "
+                    "Check for sufficient write permissions in all neo4j "
+                    "instances' data directory."
+                    )
 
         return process
     
@@ -155,8 +163,7 @@ class Neo4jHelper(object):
                             [
                     Configurator.getPath(Configurator.KEY_SPAWN_SCRIPT),
                     Configurator.getPath(Configurator.KEY_BASE_DIR) + "/config", 
-                    path, str(port),
-                    Configurator.getPath(Configurator.KEY_PHP_PARSE_RESULTS)
+                    path, str(port)
                     ],
                             preexec_fn=os.setsid
                             )

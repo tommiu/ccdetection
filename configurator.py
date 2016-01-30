@@ -11,6 +11,7 @@ class Configurator(object):
     Writes and loads data from a config file.
     """
 
+    KEY_PHP7  = "php7"
     KEY_NEO4J = "neo4j"
     KEY_GRAPHDBS  = "graphdbs"
     KEY_BASE_DIR  = "basedir"
@@ -21,6 +22,7 @@ class Configurator(object):
     KEY_BATCH_IMPORT = "batch_import"
     KEY_PHP_PARSE_RESULTS = "php_parser_results"
     
+    PATH_PHP7  = "php7"
     PATH_NEO4j = "neo4j"
     PATH_GRAPHDBS  = "graphs"
     PATH_PHP_JOERN = "phpjoern"
@@ -82,6 +84,7 @@ class Configurator(object):
         if path[-1] == "/":
             path = path[:-1]
         
+        config_dict[self.KEY_PHP7]  = base_dir + "/" + self.PATH_PHP7
         config_dict[self.KEY_NEO4J] = path + "/" + self.PATH_NEO4j
         config_dict[self.KEY_BASE_DIR]  = base_dir
         config_dict[self.KEY_GRAPHDBS]  = base_dir + "/" + self.PATH_GRAPHDBS

@@ -267,7 +267,8 @@ cd gremlin-plugin
 
 _CTR=`expr $_CTR + 1`
 if (("$SKIP" < "$_CTR")) ; then
-if ! mvn clean package
+# There were some problems with the maven license check of the Gremlin plugin - using -Dlicense.skip we can skip these checks.
+if ! mvn clean package -Dlicense.skip=true
 then
 	informRestart $1 $2 $_CTR
 	exit

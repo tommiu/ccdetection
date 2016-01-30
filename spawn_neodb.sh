@@ -1,6 +1,7 @@
 #!/bin/bash
 
-if [ -z "$1" ] || [ -z "$2" ] || [ -z "$3" ] || [ -z "$4" ]; then
+#if [ -z "$1" ] || [ -z "$2" ] || [ -z "$3" ] || [ -z "$4" ]; then
+if [ -z "$1" ] || [ -z "$2" ] || [ -z "$3" ] ; then
     echo "You need to specify four program arguments:"
     echo "1. Path to the ccdetection config file. 2. Path to the PHP project to parse. 3. The graph database id (1-4). 4. Output directory for the php parser."
     exit
@@ -25,7 +26,7 @@ function readVal {
 CONFIG_FILE=$1
 PHP_PROJECT_PATH=$2
 GRAPH_ID=$3
-PARSE_OUTPUT_DIR=$4
+#PARSE_OUTPUT_DIR=$4
 
 PATH_NEO4J=$(readVal $CONFIG_FILE "neo4j")
 PATH_PHPJOERN=$(readVal $CONFIG_FILE "phpjoern")
@@ -47,9 +48,10 @@ fi
 # 2. Output directory.
 # 3. Appendix to filename (to distinguish output from multiple php parses).
 # 4. Path to PHPJOERN
-echo "${PATH_PHPPARSER}/parser $PHP_PROJECT_PATH $PARSE_OUTPUT_DIR $GRAPH_ID $PATH_PHPJOERN"
-echo "$JEXP_HOME ${PATH_GRAPHDBS} ${PATH_PHPPARSE_RESULTS}"
-${PATH_PHPPARSER}/parser $PHP_PROJECT_PATH $PARSE_OUTPUT_DIR $GRAPH_ID $PATH_PHPJOERN
+#echo "${PATH_PHPPARSER}/parser $PHP_PROJECT_PATH $PARSE_OUTPUT_DIR $GRAPH_ID $PATH_PHPJOERN"
+#echo "$JEXP_HOME ${PATH_GRAPHDBS} ${PATH_PHPPARSE_RESULTS}"
+#${PATH_PHPPARSER}/parser $PHP_PROJECT_PATH $PARSE_OUTPUT_DIR $GRAPH_ID $PATH_PHPJOERN
+${PATH_PHPPARSER}/parser $PHP_PROJECT_PATH $GRAPH_ID
 
 # Create graph database from AST.
 HEAP=6G; java -classpath "$JEXP_HOME/lib/*" -Xmx$HEAP -Xms$HEAP -Dfile.encoding=UTF-8 org.neo4j.batchimport.Importer ${PATH_PHPJOERN}/conf/batch.properties ${PATH_GRAPHDBS}/graph${GRAPH_ID}.db ${PATH_PHPPARSE_RESULTS}/nodes.csv${GRAPH_ID} ${PATH_PHPPARSE_RESULTS}/rels.csv${GRAPH_ID}
