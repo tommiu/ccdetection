@@ -84,7 +84,7 @@ class Configurator(object):
         if path[-1] == "/":
             path = path[:-1]
         
-        config_dict[self.KEY_PHP7]  = base_dir + "/" + self.PATH_PHP7
+        config_dict[self.KEY_PHP7]  = path + "/" + self.PATH_PHP7
         config_dict[self.KEY_NEO4J] = path + "/" + self.PATH_NEO4j
         config_dict[self.KEY_BASE_DIR]  = base_dir
         config_dict[self.KEY_GRAPHDBS]  = base_dir + "/" + self.PATH_GRAPHDBS

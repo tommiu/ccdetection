@@ -170,7 +170,7 @@ function parse_file( $path, $csvexporter) : int {
   echo "Parsing file ", $finfo->getPathname(), PHP_EOL;
 
   try {
-    $ast = ast\parse_file( $path);
+    $ast = ast\parse_file( $path, 10);
 
     // The above may throw a ParseError. We only export to CSV if that
     // didn't happen.
