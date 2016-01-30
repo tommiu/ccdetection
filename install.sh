@@ -9,6 +9,9 @@
 # Java JDK (tested with OpenJDK 7)
 # E.g. to install OpenJDK 7: sudo apt-get install openjdk-7-jdk
 
+# Ctrl-C should kill complete process group.
+trap "kill 0" SIGINT
+
 function informRestart {
 	echo "Install failed at step `expr $3 - 1`. Restart using following command:"
 	echo "./install.sh $1 $2 `expr $3 - 1`"
@@ -30,6 +33,8 @@ else
 	SKIP=$3
 
 fi
+
+
 
 INSTALL_PATH=$1
 NEO4J_BASEDIR=$1/neo4j
@@ -55,8 +60,8 @@ cd $INSTALL_PATH
 
 _CTR=`expr $_CTR + 1`
 if (("$SKIP" < "$_CTR")) ; then
-# Get phpjoern and python-joern
-if ! git clone ssh://git@service.cispa.uni-saarland.de:2222/phpjoern.git
+# Get the old phpjoern version.
+if ! git clone https://github.com/tommiu/phpjoern_mirror.git phpjoern
 then
 	informRestart $1 $2 $_CTR
 	exit
@@ -85,7 +90,8 @@ fi
 
 _CTR=`expr $_CTR + 1`
 if (("$SKIP" < "$_CTR")) ; then
-if ! git clone ssh://git@service.cispa.uni-saarland.de:2222/python-joern.git
+# Get the old python-joern version.
+if ! git clone https://github.com/tommiu/python-joern_mirror.git python-joern
 then
 	informRestart $1 $2 $_CTR
 	exit
@@ -95,26 +101,26 @@ fi
 cd python-joern
 
 # Get PHPJoernSteps extension for python-joern.
-_CTR=`expr $_CTR + 1`
-if (("$SKIP" < "$_CTR")) ; then
-if ! git checkout portPHPJoern
-then
-	informRestart $1 $2 $_CTR
-	exit
-fi
-fi
+#_CTR=`expr $_CTR + 1`
+#if (("$SKIP" < "$_CTR")) ; then
+#if ! git checkout portPHPJoern
+#then
+#	informRestart $1 $2 $_CTR
+#	exit
+#fi
+#fi
 
 cd $INSTALL_PATH
 
 # Install custom gremlin steps for python-joern.
-_CTR=`expr $_CTR + 1`
-if (("$SKIP" < "$_CTR")) ; then
-if ! cp -r $THIS_SCRIPT_DIR/custom_gremlin_steps $INSTALL_PATH/python-joern/joern/phpjoernsteps/.
-then
-    informRestart $1 $2 $_CTR
-    exit
-fi
-fi
+#_CTR=`expr $_CTR + 1`
+#if (("$SKIP" < "$_CTR")) ; then
+#if ! cp -r $THIS_SCRIPT_DIR/custom_gremlin_steps $INSTALL_PATH/python-joern/joern/phpjoernsteps/.
+#then
+#    informRestart $1 $2 $_CTR
+#    exit
+#fi
+#fi
 
 _CTR=`expr $_CTR + 1`
 if (("$SKIP" < "$_CTR")) ; then
