@@ -71,7 +71,7 @@ fi
 _CTR=`expr $_CTR + 1`
 if (("$SKIP" < "$_CTR")) ; then
 # Copy extended PHP parser script into phpjoern
-if ! cp $THIS_SCRIPT_DIR/AST_parser/src/Parser.php $INSTALL_DIR/phpjoern/src/Parser.php
+if ! cp $THIS_SCRIPT_DIR/AST_parser/src/Parser.php $INSTALL_PATH/phpjoern/src/Parser.php
 then
 	informRestart $1 $2 $_CTR
 	exit
@@ -81,7 +81,7 @@ fi
 _CTR=`expr $_CTR + 1`
 if (("$SKIP" < "$_CTR")) ; then
 # Copy extended PHP parser script into phpjoern
-if ! cp $THIS_SCRIPT_DIR/AST_parser/src/util.php $INSTALL_DIR/phpjoern/src/util.php
+if ! cp $THIS_SCRIPT_DIR/AST_parser/src/util.php $INSTALL_PATH/phpjoern/src/util.php
 then
 	informRestart $1 $2 $_CTR
 	exit
