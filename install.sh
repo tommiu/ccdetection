@@ -15,12 +15,12 @@ function informRestart {
 }
 
 if [ -z "$1" ]; then
-	echo "Please specify a path to install all utilities to as first program argument."
+	echo "Please specify a path to install all utilities to as first program argument. I.e. the base directory for all tools."
 	exit
 fi
 
 if [ -z "$2" ]; then
-	echo "Please specify the number of CPUs to use as second program argument."
+	echo "Please specify the number of CPUs to use for multithreading as second program argument. It is needed to setup multiple graph databases for ccdetection to work in parallel, using all specified CPUs."
 	exit
 fi
 
@@ -39,7 +39,7 @@ THIS_SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 _CTR=0
 
-echo "The install script requires sudo privileges for some steps. These steps are:"
+echo "The install script asks for sudo privileges for some steps. These steps are:"
 echo "apt-get update"
 echo "apt-get install autoconf bison flex maven unzip libxml2-dev python-setuptools python-dev -y"
 echo "(For python-joern 0.3.1) python2 setup.py install"
@@ -66,8 +66,17 @@ fi
 _CTR=`expr $_CTR + 1`
 if (("$SKIP" < "$_CTR")) ; then
 # Copy extended PHP parser script into phpjoern
-if ! cp $THIS_SCRIPT_DIR/AST_parser/Parser.php phpjoern/src/Parser.php
-    /opt/phpjoern/src/Parser.php
+if ! cp $THIS_SCRIPT_DIR/AST_parser/src/Parser.php $INSTALL_DIR/phpjoern/src/Parser.php
+then
+	informRestart $1 $2 $_CTR
+	exit
+fi
+fi
+
+_CTR=`expr $_CTR + 1`
+if (("$SKIP" < "$_CTR")) ; then
+# Copy extended PHP parser script into phpjoern
+if ! cp $THIS_SCRIPT_DIR/AST_parser/src/util.php $INSTALL_DIR/phpjoern/src/util.php
 then
 	informRestart $1 $2 $_CTR
 	exit
@@ -268,33 +277,18 @@ then
 fi
 fi
 
-# Copy the neo4j installation to three other places, so that we can use four different neo4j instances at once.
-_CTR=`expr $_CTR + 1`
-if (("$SKIP" < "$_CTR")) ; then
-if ! cp -r $NEO4J_BASEDIR/neo4j-01 $NEO4J_BASEDIR/neo4j-02
-then
-    informRestart $1 $2 $_CTR
-    exit
-fi
-fi
-
-_CTR=`expr $_CTR + 1`
-if (("$SKIP" < "$_CTR")) ; then
-if ! cp -r $NEO4J_BASEDIR/neo4j-01 $NEO4J_BASEDIR/neo4j-03
-then
-    informRestart $1 $2 $_CTR
-    exit
-fi
-fi
-
-_CTR=`expr $_CTR + 1`
-if (("$SKIP" < "$_CTR")) ; then
-if ! cp -r $NEO4J_BASEDIR/neo4j-01 $NEO4J_BASEDIR/neo4j-04
-then
-    informRestart $1 $2 $_CTR
-    exit
-fi
-fi
+# Copy the neo4j installation to more places, so that we can use different neo4j instances when multithreading.
+for i in `seq 2 $CPUS`;
+do
+    _CTR=`expr $_CTR + 1`
+    if (("$SKIP" < "$_CTR")) ; then
+    if ! cp -r $NEO4J_BASEDIR/neo4j-01 $NEO4J_BASEDIR/neo4j-0$i
+    then
+        informRestart $1 $2 $_CTR
+        exit
+    fi
+    fi
+done
 
 # Next: Install batch-import 2.1 (should match neo4j version). 
 # This is needed to import graph databases into neo4j 2.1.
@@ -372,16 +366,19 @@ fi
 fi
 
 # Link neo4j databases
-_CTR=`expr $_CTR + 1`
-if (("$SKIP" < "$_CTR")) ; then
-if ! ln -s $THIS_SCRIPT_DIR/graphs/graph1.db $NEO4J_BASEDIR/neo4j-01/data/graph.db || ! ln -s $THIS_SCRIPT_DIR/graphs/graph2.db $NEO4J_BASEDIR/neo4j-02/data/graph.db || ! ln -s $THIS_SCRIPT_DIR/graphs/graph3.db $NEO4J_BASEDIR/neo4j-03/data/graph.db || ! ln -s $THIS_SCRIPT_DIR/graphs/graph4.db $NEO4J_BASEDIR/neo4j-04/data/graph.db
-then
-    informRestart $1 $2 $_CTR
-    exit
-fi
-fi
+for i in `seq 1 $CPUS`;
+do
+    _CTR=`expr $_CTR + 1`
+    if (("$SKIP" < "$_CTR")) ; then
+    if ! ln -s $THIS_SCRIPT_DIR/graphs/graph${i}.db $NEO4J_BASEDIR/neo4j-0${i}/data/graph.db
+    then
+        informRestart $1 $2 $_CTR
+        exit
+    fi
+    fi
+done
 
 echo "Installation finished!"
 echo "Python dependencies were not installied. You will need the following python packages:"
 echo "pexpect"
-echo "Start using ccdetection using 'python2 main.py help'"
+echo "Start using ccdetection with 'python2 main.py help'"

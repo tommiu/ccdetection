@@ -1,7 +1,6 @@
 *~
 *.pyc
 .fuse_hidden*
-AST_parser/parse_results/
 config
 graphs/
 lol/

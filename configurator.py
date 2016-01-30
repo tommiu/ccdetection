@@ -76,7 +76,7 @@ class Configurator(object):
                             "Format error in config file on line %d." % (cnt)
                             )
 
-    def setupConfig(self, config_path, base_dir, path):
+    def setupConfig(self, config_path, base_dir, path, start_port=7473):
         config_dict = {}
         
         if path[-1] == "/":
@@ -114,11 +114,20 @@ class Configurator(object):
         # Write the server config file for every neoj4 instance.
         # They differ in the ports (http and https) they use.
         neo_4j_path = config_dict[self.KEY_NEO4J] + \
-                        "/neo4j-0%d/conf/neo4j-server.properties" 
-        self.writeNeo4jConfig(neo_4j_path % 1, 7474, 7484)
-        self.writeNeo4jConfig(neo_4j_path % 2, 7475, 7485)
-        self.writeNeo4jConfig(neo_4j_path % 3, 7476, 7486)
-        self.writeNeo4jConfig(neo_4j_path % 4, 7477, 7487)
+                        "/neo4j-0%d/conf/neo4j-server.properties"
+                        
+        # Check number of neo4j instances
+        
+        neo4j_count = 0
+        for path in os.listdir(config_dict[self.KEY_NEO4J]):
+            if os.path.isdir(os.path.join(config_dict[self.KEY_NEO4J], path)):
+                if path[0:6] == "neo4j-":
+                    neo4j_count += 1
+        
+        for i in range(1, neo4j_count + 1):
+            self.writeNeo4jConfig(
+                        neo_4j_path % i, start_port + i, start_port + 100 + i
+                        )
         
         # Make scripts executable
         filepath = config_dict[self.KEY_SPAWN_SCRIPT]
