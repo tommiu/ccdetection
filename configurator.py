@@ -11,8 +11,11 @@ class Configurator(object):
     Writes and loads data from a config file.
     """
 
+    DEFAULT_HEAP_SIZE = "6G"
+
     KEY_PHP7  = "php7"
     KEY_NEO4J = "neo4j"
+    KEY_HEAPSIZE  = "heap_size"
     KEY_GRAPHDBS  = "graphdbs"
     KEY_BASE_DIR  = "basedir"
     KEY_PHP_JOERN = "phpjoern"
@@ -78,6 +81,12 @@ class Configurator(object):
                             "Format error in config file on line %d." % (cnt)
                             )
 
+    @staticmethod
+    def getHeapVal():
+        heap_size_str = Configurator.config[Configurator.KEY_HEAPSIZE]
+        heap_size = [int(heap_size_str[:-1]), heap_size_str[-1]]
+        return heap_size
+
     def setupConfig(self, config_path, base_dir, path, start_port=7473):
         config_dict = {}
         
@@ -98,6 +107,8 @@ class Configurator(object):
                                     config_dict[self.KEY_PHP_PARSER] + "/" +
                                     self.PATH_PHP_PARSE_RESULTS
                                     )
+        
+        config_dict[self.KEY_HEAPSIZE] = self.DEFAULT_HEAP_SIZE
         
         self.writeConfigFile(
                         config_path,

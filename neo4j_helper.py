@@ -16,10 +16,23 @@ class Neo4jHelper(object):
     Handling of everything concerning neo4j.
     """
 
+    HEAP_SIZE = [100, "G"] # G = Gigabyte, M = Megabyte
+
     def __init__(self):
         '''
         Constructor
         '''
+    
+    @staticmethod
+    def setHeapsize(size, unit):
+        # Allowed units are "G" (gigabyte) or "M" (megabyte).
+        if unit == "G" or unit == "M" and isinstance(size, int):
+            Neo4jHelper.HEAP_SIZE[0:2] = size, unit
+            
+        else:
+            raise Exception("Trying to set faulty heap size: %s%s." % (
+                                                                str(size), unit
+                                                                ))
     
     @staticmethod
     def setStatisticsObj(obj):
@@ -59,9 +72,6 @@ class Neo4jHelper(object):
                                         "first": first_query
                                         }
                             clones.append(code_clone)
-#                             Neo4jHelper.stats.addFoundCodeClone(
-#                                                     clone, first=first_query
-#                                                     )
                     
                     else:
                         # No code clone found.
@@ -70,9 +80,6 @@ class Neo4jHelper(object):
                             "first": first_query
                             }
                         queries.append(query)
-#                         Neo4jHelper.stats.addQuery(
-#                                                 elapsed_time, first=first_query
-#                                                 )
                         
                     first_query = False
 
@@ -99,7 +106,37 @@ class Neo4jHelper(object):
             exception = "Could not create directory in ccdetection/graphs/."
             print exception
             return Neo4jHelper.analyseData(code_and_path_and_process_number)
+        
+        except HeapException:
+            print "There is insufficient memory for allocating the heap size."
+            print "Created a hs_err_pid* file with more information."
             
+            if Neo4jHelper.HEAP_SIZE[0] > 1 and Neo4jHelper.HEAP_SIZE[1] == "G":
+                new_size = Neo4jHelper.HEAP_SIZE[0] - 1
+                unit = "G" 
+            
+            elif (
+                    Neo4jHelper.HEAP_SIZE[0] == 1 and 
+                    Neo4jHelper.HEAP_SIZE[1] == "G"
+            ):
+                new_size = Neo4jHelper.HEAP_SIZE[0] = 512
+                unit = "M"
+                
+            if Neo4jHelper.HEAP_SIZE[1] == "M":
+                new_size = Neo4jHelper.HEAP_SIZE[0] / 2
+                unit = "M"
+            
+            print "Trying again with %d%s memory for the heap." % (
+                                                                new_size, unit
+                                                                )
+            print ( 
+                "Change the heap_size parameter in the config file for a "
+                "permanent solution."
+                )
+            
+            Neo4jHelper.setHeapsize(new_size, unit)
+            return Neo4jHelper.analyseData(code_and_path_and_process_number)
+        
         except Exception as err:
             print err
             raise Exception("Critical error, exiting.")
@@ -114,7 +151,9 @@ class Neo4jHelper(object):
                             Configurator.getPath(Configurator.KEY_SPAWN_SCRIPT),
                             [
                     Configurator.getPath(Configurator.KEY_BASE_DIR) + "/config", 
-                    path, str(process_number)
+                    path, str(process_number), 
+                    "%d%s" % (Neo4jHelper.HEAP_SIZE[0], 
+                              Neo4jHelper.HEAP_SIZE[1])
                     ],
                             None
                             )
@@ -128,7 +167,11 @@ class Neo4jHelper(object):
                         "java.net.BindException",
                         "java.io.IOException: Unable to create directory path",
                         pexpect.EOF,
-                        "ERROR: No write access to data/ directory"
+                        "ERROR: No write access to data/ directory",
+                        (
+                    "There is insufficient memory for the Java Runtime "
+                    "Environment to continue."
+                    )
                         ])
         
         if expectation == 1:
@@ -150,6 +193,10 @@ class Neo4jHelper(object):
                     "Check for sufficient write permissions in all neo4j "
                     "instances' data directory."
                     )
+            
+        elif expectation == 5:
+            # Not enough space to allocate the specified amount of heap space.
+            raise HeapException()
 
         return process
     
@@ -158,12 +205,13 @@ class Neo4jHelper(object):
         Import the php file/project AST from 'path' into the neo4j 
         database and start the neo4j console, using the 'SPAWN_SCRIPT' file.
         """
-    #     print "Using path %s" % path
         process = subprocess.call(
                             [
                     Configurator.getPath(Configurator.KEY_SPAWN_SCRIPT),
                     Configurator.getPath(Configurator.KEY_BASE_DIR) + "/config", 
-                    path, str(port)
+                    path, str(port), 
+                    "%d%s" % (Neo4jHelper.HEAP_SIZE[0], 
+                              Neo4jHelper.HEAP_SIZE[1])
                     ],
                             preexec_fn=os.setsid
                             )
@@ -197,4 +245,7 @@ class BindException(BaseException):
         return self.message
 
 class PathException(Exception):
+    pass
+
+class HeapException(Exception):
     pass

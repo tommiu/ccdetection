@@ -3,8 +3,15 @@
 #if [ -z "$1" ] || [ -z "$2" ] || [ -z "$3" ] || [ -z "$4" ]; then
 if [ -z "$1" ] || [ -z "$2" ] || [ -z "$3" ] ; then
     echo "You need to specify four program arguments:"
-    echo "1. Path to the ccdetection config file. 2. Path to the PHP project to parse. 3. The graph database id (1-4). 4. Output directory for the php parser."
+    echo "1. Path to the ccdetection config file. 2. Path to the PHP project to parse. 3. The graph database id (1-4). (Optional) 4. Heap size. Default is 6G. "
     exit
+fi
+
+if [ -z "$4" ] ; then
+    # Default value for heap size.
+    HEAP_SIZE="6G"
+else
+    HEAP_SIZE=$4
 fi
 
 if [ ! -f $1 ] ; then 
@@ -54,7 +61,7 @@ fi
 ${PATH_PHPPARSER}/parser $PHP_PROJECT_PATH $GRAPH_ID
 
 # Create graph database from AST.
-HEAP=6G; java -classpath "$JEXP_HOME/lib/*" -Xmx$HEAP -Xms$HEAP -Dfile.encoding=UTF-8 org.neo4j.batchimport.Importer ${PATH_PHPJOERN}/conf/batch.properties ${PATH_GRAPHDBS}/graph${GRAPH_ID}.db ${PATH_PHPPARSE_RESULTS}/nodes.csv${GRAPH_ID} ${PATH_PHPPARSE_RESULTS}/rels.csv${GRAPH_ID}
+HEAP=$HEAP_SIZE; java -classpath "$JEXP_HOME/lib/*" -Xmx$HEAP -Xms$HEAP -Dfile.encoding=UTF-8 org.neo4j.batchimport.Importer ${PATH_PHPJOERN}/conf/batch.properties ${PATH_GRAPHDBS}/graph${GRAPH_ID}.db ${PATH_PHPPARSE_RESULTS}/nodes.csv${GRAPH_ID} ${PATH_PHPPARSE_RESULTS}/rels.csv${GRAPH_ID}
 
 # Start neo4j graph database server.
 ${PATH_NEO4J}/neo4j-0${GRAPH_ID}/bin/neo4j console

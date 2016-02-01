@@ -79,6 +79,8 @@ def main(argv):
         except:
             pass
         
+        heap_size = Configurator.getHeapVal()
+        Neo4jHelper().setHeapsize(heap_size[0], heap_size[1])
         Neo4jHelper().startConsole(os.path.abspath(flow["in"]), str(id))
     
     elif flow[parser.KEY_MODE] == ARGS_SEARCH:
@@ -179,6 +181,8 @@ def startSearchMode(flow, continuous=False):
     level = 0
     multithreads = 0
     neo4j_helper = Neo4jHelper()
+    heap_size = Configurator.getHeapVal()
+    neo4j_helper.setHeapsize(heap_size[0], heap_size[1])
     
     if continuous:
         # Continuous mode was specified, so read the config file
